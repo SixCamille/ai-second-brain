@@ -358,6 +358,10 @@ function renderSetupRequiredPage() {
         border-color: color-mix(in srgb, CanvasText 18%, Canvas 82%);
         background: Canvas;
       }
+      .action-link {
+        color: #2563eb;
+        font-weight: 650;
+      }
       .hint,
       .step {
         color: color-mix(in srgb, CanvasText 68%, Canvas 32%);
@@ -388,14 +392,15 @@ function renderSetupRequiredPage() {
   <body>
     <main>
       <h1>Initialize AI Second Brain</h1>
-      <p class="hint">The view is protected by default. Choose a password, then copy the generated variables into the Vercel environment.</p>
+      <p class="hint">The view is protected by default. Choose a password, then copy the generated variables into the Vercel environment that serves this URL.</p>
+      <p class="hint">Need persistent memory? <a class="action-link" href="https://vercel.com/marketplace/upstash" target="_blank" rel="noreferrer">Install Upstash Redis on Vercel</a>, then create a new deployment after Vercel adds the Redis variables.</p>
       <label for="view-url">View URL</label>
       <input id="view-url" type="url" value="${setupDefaultViewUrl()}">
       <label for="password">View password</label>
       <input id="password" type="password" autocomplete="new-password" autofocus>
       <button id="generate" type="button">Generate variables</button>
       <button id="copy" class="secondary hidden" type="button">Copy</button>
-      <p class="step hidden" id="next-step">Add these variables in Vercel, redeploy, then return to this page to sign in.</p>
+      <p class="step hidden" id="next-step">Add these variables in Vercel, create a new deployment, then return to this page. If this setup screen still appears, the deployment cannot see BRAIN_VIEW_PASSWORD_HASH.</p>
       <textarea id="env-output" class="hidden" readonly></textarea>
       <code id="mcp-output" class="hidden"></code>
     </main>

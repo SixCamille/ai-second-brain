@@ -46,6 +46,8 @@ UPSTASH_REDIS_REST_URL=...
 UPSTASH_REDIS_REST_TOKEN=...
 ```
 
+The initialization screen includes an **Install Upstash Redis on Vercel** link. Use it to attach Redis from the browser, then create a new deployment after Vercel adds the Redis environment variables.
+
 4. Deploy once.
 5. Open the deployed view. The initialization screen appears when no view password is configured.
 6. Generate and copy the runtime variables shown by the page:
@@ -56,7 +58,9 @@ BRAIN_MCP_SECRET=...
 BRAIN_VIEW_PASSWORD_HASH=...
 ```
 
-7. Add those variables to Vercel, then redeploy.
+7. Add those variables to the same Vercel environment that serves the URL you are opening, then create a new deployment.
+
+After the new deployment starts, opening the view should show the password login screen, not the initialization screen. A fresh or empty memory graph is normal after login. If the initialization screen still appears, the running deployment cannot see any view password variable. Check that `BRAIN_VIEW_PASSWORD_HASH` was added to the right Vercel environment (`Production` for the production URL, `Preview` for preview URLs), that the value starts with `sha256:`, and that the deployment was created after the variable was saved.
 
 When either Redis REST pair is present, AI Second Brain automatically uses Redis/KV for objects, events, user instructions, and mutable kind configuration. Without those variables, local development falls back to repository folders for runtime memory.
 
@@ -91,8 +95,16 @@ BRAIN_MCP_SECRET=...
 BRAIN_VIEW_PASSWORD_HASH=...
 ```
 
-6. Add them to the deployment environment.
-7. Redeploy, then reopen the view and sign in.
+6. Add them to the deployment environment that matches the URL you are using.
+7. Create a new deployment, then reopen the view and sign in.
+
+Expected result:
+
+- Before `BRAIN_VIEW_PASSWORD_HASH` exists at runtime, the view shows the initialization screen.
+- After `BRAIN_VIEW_PASSWORD_HASH` exists at runtime, the view shows the login screen.
+- After login, an empty graph is expected until objects are created through MCP.
+
+If the initialization screen returns after redeploying, the deployed function still has no configured view password. This is usually caused by adding variables only to `Preview` while opening the production URL, adding them only to `Production` while opening a preview URL, or reopening an older deployment created before the variables existed.
 
 ## Connect An MCP Client
 

@@ -214,6 +214,8 @@ UPSTASH_REDIS_REST_URL
 UPSTASH_REDIS_REST_TOKEN
 ```
 
+The initialization screen includes a direct **Install Upstash Redis on Vercel** link to the Vercel Marketplace. Use it to attach a Redis store to the Vercel project from the browser. After Vercel adds the Redis environment variables, create a new deployment so the running app can see them.
+
 ## Web Setup
 
 The view is protected by default. Without a configured password, it shows an initialization assistant instead of rendering the graph. This screen lets the user choose a password and generates these values in the browser:
@@ -222,7 +224,15 @@ The view is protected by default. Without a configured password, it shows an ini
 - `BRAIN_MCP_SECRET`
 - `BRAIN_VIEW_PASSWORD_HASH`
 
-Copy these variables into the Vercel environment, redeploy, then return to the view to sign in. The password is never stored in plain text.
+Copy these variables into the Vercel environment that matches the URL you are using, then create a new deployment and return to the view to sign in. The password is never stored in plain text.
+
+Expected setup flow:
+
+- No runtime view password: the initialization screen is shown.
+- Runtime `BRAIN_VIEW_PASSWORD_HASH`, `BRAIN_VIEW_PASSWORD`, or `VIEW_PASSWORD` present: the login screen is shown.
+- Successful login with no stored objects yet: an empty graph is shown.
+
+If the initialization screen still appears after adding variables, the deployed function cannot see a view password variable. Check that `BRAIN_VIEW_PASSWORD_HASH` is saved without quotes or extra spaces, starts with `sha256:`, is assigned to the correct Vercel environment (`Production` for the production URL, `Preview` for preview deployments), and that the deployment you are opening was created after the variables were saved.
 
 Once signed into the view, the `MCP` button shows the MCP URL and the view URL in a pop-up, so they can be recovered if the link is lost.
 
