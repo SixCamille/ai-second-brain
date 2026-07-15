@@ -19,7 +19,13 @@ Ce guide décrit le parcours complet pour installer AI Second Brain depuis l'int
 6. Garder le root directory sur `./`.
 7. Cliquer sur `Deploy`.
 
+![Vercel new project settings](docs/assets/setup/01-vercel-new-project.png)
+
+![Deploy from GitHub URL](docs/assets/setup/02-vercel-deploy-from-github.png)
+
 Vercel crée un premier déploiement et affiche une page de confirmation.
+
+![First Vercel deployment completed](docs/assets/setup/03-vercel-deployed-initialize.png)
 
 ## 2. Installer Redis Sur Vercel
 
@@ -30,6 +36,8 @@ Redis est obligatoire sur Vercel. Sans Redis, AI Second Brain ne peut pas écrir
 3. Cliquer sur `Continue`.
 4. Attacher Upstash au projet AI Second Brain.
 5. Vérifier que Vercel ajoute les variables Redis au projet.
+
+![Install Upstash integration](docs/assets/setup/04-upstash-marketplace.png)
 
 Variables acceptées :
 
@@ -53,6 +61,10 @@ KV_REST_API_TOKEN
 4. Cliquer sur `Generate variables`.
 5. Cliquer sur `Copy`.
 
+![Initialize view URL and password](docs/assets/setup/05-initialize-view-url.png)
+
+![Copy generated variables](docs/assets/setup/06-copy-generated-variables.png)
+
 Le bloc copié contient :
 
 ```text
@@ -72,6 +84,8 @@ BRAIN_VIEW_PASSWORD_HASH=...
 4. Les ajouter à l'environnement qui sert l'URL utilisée, généralement `Production`.
 5. Vérifier que les variables Redis sont aussi présentes sur ce même environnement.
 
+![Add generated environment variables in Vercel](docs/assets/setup/07-vercel-env-variables.png)
+
 ## 5. Redéployer
 
 Les nouvelles variables ne sont pas visibles par un déploiement déjà créé.
@@ -81,6 +95,8 @@ Les nouvelles variables ne sont pas visibles par un déploiement déjà créé.
 3. Choisir l'environnement `Production`.
 4. Lancer le redéploiement.
 
+![Redeploy production after adding variables](docs/assets/setup/08-vercel-redeploy.png)
+
 Après le redéploiement, rouvrir l'URL publique.
 
 Résultat attendu :
@@ -89,11 +105,15 @@ Résultat attendu :
 - Après les variables de vue et le redéploiement : écran de login.
 - Après login : graphe AI Second Brain, vide au départ.
 
+![AI Second Brain login screen](docs/assets/setup/09-login-screen.png)
+
 ## 6. Récupérer L'URL MCP
 
 1. Se connecter à la vue avec le mot de passe choisi.
 2. Cliquer sur le bouton `MCP`.
 3. Copier la valeur `MCP URL`.
+
+![MCP access popover](docs/assets/setup/10-mcp-access.png)
 
 Cette URL ressemble à :
 
@@ -106,6 +126,9 @@ https://<projet>.vercel.app/api/mcp?key=<secret>
 1. Ouvrir la page `Plugins` dans ChatGPT.
 2. Aller dans l'onglet `Personnel`.
 3. Cliquer sur le bouton `+`.
+
+![ChatGPT personal plugins tab](docs/assets/setup/11-chatgpt-plugins-personal.png)
+
 4. Remplir le formulaire :
    - `Nom` : `AI Second Brain`
    - `Description` : une description courte, par exemple `Mon second cerveau pour créer des noeuds et organiser les idées`
@@ -115,6 +138,8 @@ https://<projet>.vercel.app/api/mcp?key=<secret>
 5. Lire l'avertissement sur les serveurs MCP personnalisés.
 6. Cocher la confirmation si vous acceptez le risque.
 7. Enregistrer le plugin.
+
+![ChatGPT new plugin form](docs/assets/setup/12-chatgpt-new-plugin.png)
 
 Le secret MCP est déjà dans l'URL sous forme de paramètre `key`, donc il ne faut pas configurer une authentification séparée dans ChatGPT.
 
