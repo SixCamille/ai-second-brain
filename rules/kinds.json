@@ -1,0 +1,88 @@
+{
+  "kinds": [
+    {
+      "kind": "project",
+      "color": {
+        "fill": "hsl(205 82% 88%)",
+        "stroke": "hsl(205 72% 35%)"
+      }
+    },
+    {
+      "kind": "task",
+      "color": {
+        "fill": "hsl(32 90% 86%)",
+        "stroke": "hsl(28 78% 36%)"
+      }
+    },
+    {
+      "kind": "idea",
+      "color": {
+        "fill": "hsl(145 60% 86%)",
+        "stroke": "hsl(150 62% 30%)"
+      }
+    },
+    {
+      "kind": "decision",
+      "color": {
+        "fill": "hsl(276 68% 89%)",
+        "stroke": "hsl(274 58% 40%)"
+      }
+    },
+    {
+      "kind": "routine",
+      "color": {
+        "fill": "hsl(354 78% 89%)",
+        "stroke": "hsl(350 66% 40%)"
+      }
+    },
+    {
+      "kind": "preference",
+      "color": {
+        "fill": "hsl(178 62% 86%)",
+        "stroke": "hsl(184 70% 30%)"
+      }
+    },
+    {
+      "kind": "resource",
+      "color": {
+        "fill": "hsl(52 90% 84%)",
+        "stroke": "hsl(45 82% 34%)"
+      }
+    },
+    {
+      "kind": "person",
+      "color": {
+        "fill": "hsl(230 78% 90%)",
+        "stroke": "hsl(232 58% 42%)"
+      }
+    },
+    {
+      "kind": "organization",
+      "color": {
+        "fill": "hsl(115 54% 86%)",
+        "stroke": "hsl(120 54% 31%)"
+      }
+    },
+    {
+      "kind": "watch_topic",
+      "color": {
+        "fill": "hsl(318 70% 89%)",
+        "stroke": "hsl(320 62% 39%)"
+      }
+    },
+    {
+      "kind": "event",
+      "color": {
+        "fill": "hsl(18 86% 88%)",
+        "stroke": "hsl(14 72% 38%)"
+      }
+    },
+    {
+      "kind": "bug",
+      "color": {
+        "fill": "hsl(220 9% 88%)",
+        "stroke": "hsl(220 9% 18%)"
+      }
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "version": 2,
+  "functions": {
+    "api/mcp.js": {
+      "maxDuration": 30,
+      "includeFiles": "rules/*.md"
+    },
+    "api/index.js": {
+      "includeFiles": "rules/*.md"
+    }
+  },
+  "routes": [
+    {
+      "src": "/",
+      "dest": "/api/index"
+    },
+    {
+      "src": "/mcp",
+      "dest": "/api/mcp"
+    },
+    {
+      "src": "/health",
+      "dest": "/api/health"
+    },
+    {
+      "src": "/assets/styles.css",
+      "dest": "/api/assets/styles.css"
+    },
+    {
+      "src": "/assets/view.js",
+      "dest": "/api/assets/view.js"
+    },
+    {
+      "src": "/assets/agents/([a-z0-9_-]+\\.(png|svg|webp))",
+      "dest": "/api/assets/agents?file=$1"
+    },
+    {
+      "src": "/favicon.svg",
+      "dest": "/api/favicon.svg"
+    },
+    {
+      "src": "/favicon.ico",
+      "dest": "/api/favicon.svg"
+    }
+  ]
+}

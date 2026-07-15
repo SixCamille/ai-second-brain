@@ -1,0 +1,9 @@
+{
+  "name": "second-brain",
+  "version": "0.1.0",
+  "objects_dir": "objects",
+  "events_dir": "events",
+  "rules_dir": "rules",
+  "default_context_limit": 5,
+  "view_url": ""
+}

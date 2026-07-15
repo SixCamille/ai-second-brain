@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Second Brain Object",
+  "type": "object",
+  "required": ["id", "kind", "title", "summary", "content", "relations", "dates"],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^obj_[a-z0-9_]+$"
+    },
+    "kind": {
+      "type": "string",
+      "minLength": 1
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "summary": {
+      "type": "string"
+    },
+    "priority": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "content": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "relations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["to"],
+        "additionalProperties": false,
+        "properties": {
+          "to": {
+            "type": "string",
+            "pattern": "^obj_[a-z0-9_]+$"
+          },
+          "importance": {
+            "type": "number",
+            "exclusiveMinimum": 0,
+            "maximum": 1
+          }
+        }
+      }
+    },
+    "dates": {
+      "type": "object",
+      "required": ["created_at", "updated_at", "last_seen_at"],
+      "additionalProperties": false,
+      "properties": {
+        "created_at": {
+          "type": "string"
+        },
+        "updated_at": {
+          "type": "string"
+        },
+        "last_seen_at": {
+          "type": "string"
+        },
+        "deadline_at": {
+          "type": "string"
+        },
+        "completed_at": {
+          "type": "string"
+        },
+        "archived_at": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

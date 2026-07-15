@@ -1,0 +1,1317 @@
+:root {
+  color-scheme: light dark;
+  --font-body: "Segoe UI Variable Text", Aptos, Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-display: Bahnschrift, "Segoe UI Variable Display", "Aptos Display", Inter, ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Cascadia Code", "SFMono-Regular", Consolas, ui-monospace, monospace;
+  font-family: var(--font-body);
+  font-feature-settings: "ss01", "cv01";
+  --line: color-mix(in srgb, CanvasText 15%, Canvas 85%);
+  --muted: color-mix(in srgb, CanvasText 62%, Canvas 38%);
+  --soft: color-mix(in srgb, CanvasText 6%, Canvas 94%);
+  --surface: color-mix(in srgb, CanvasText 3%, Canvas 97%);
+  --surface-raised: color-mix(in srgb, CanvasText 1%, Canvas 99%);
+  --strong: color-mix(in srgb, CanvasText 88%, Canvas 12%);
+  --accent: #2563eb;
+  --accent-soft: color-mix(in srgb, #2563eb 14%, Canvas 86%);
+  --green: #059669;
+  --amber: #b45309;
+  --red: #dc2626;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  min-height: 100vh;
+  margin: 0;
+  background: Canvas;
+  color: CanvasText;
+  overflow-x: hidden;
+}
+button,
+input {
+  font: inherit;
+}
+button {
+  color: inherit;
+}
+main {
+  width: 88.75em;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 2.5em 1em;
+}
+h1 {
+  margin: 0 0 0.227em;
+  font-family: var(--font-display);
+  font-size: clamp(1.75em, 5vw, 2.75em);
+  font-weight: 650;
+  line-height: 1.02;
+  letter-spacing: 0;
+}
+h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.063em;
+  font-weight: 650;
+  letter-spacing: 0;
+}
+h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 0.938em;
+  font-weight: 650;
+  letter-spacing: 0;
+}
+p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+.intro {
+  margin-bottom: 1.75em;
+}
+.intro-text {
+  display: inline-block;
+  width: 70%;
+  vertical-align: bottom;
+}
+.metrics {
+  display: inline-block;
+  width: 30%;
+  text-align: right;
+  vertical-align: bottom;
+}
+.metric {
+  display: inline-block;
+  width: 48%;
+  min-width: 0;
+  padding: 0.875em;
+  border: thin solid var(--line);
+  border-radius: 0.5em;
+  background: var(--surface);
+  box-shadow: 0 0.5em 1.75em color-mix(in srgb, CanvasText 6%, transparent);
+  text-align: left;
+  vertical-align: top;
+}
+.metric + .metric {
+  margin-left: 4%;
+}
+.metric strong {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 1.688em;
+  font-weight: 650;
+  line-height: 1;
+}
+.metric span,
+.kind span,
+.node-meta,
+.detail-meta,
+.empty {
+  color: var(--muted);
+  font-size: 0.813em;
+}
+.panel {
+  border: thin solid color-mix(in srgb, CanvasText 11%, Canvas 89%);
+  border-radius: 0.5em;
+  padding: 1em;
+  background: var(--surface-raised);
+  box-shadow: 0 0.5em 1.875em color-mix(in srgb, CanvasText 5%, transparent);
+  min-width: 0;
+}
+.toolbar {
+  margin: 0.875em 0;
+}
+.toolbar > * + * {
+  margin-left: 0.625em;
+}
+.icon-button,
+.plain-button {
+  border: thin solid var(--line);
+  border-radius: 0.5em;
+  background: Canvas;
+  color: CanvasText;
+  cursor: pointer;
+}
+.icon-button {
+  width: 2.375em;
+  height: 2.375em;
+  display: inline-block;
+  font-size: 1.125em;
+  line-height: 2em;
+  text-align: center;
+  vertical-align: middle;
+}
+.plain-button {
+  font-family: var(--font-display);
+  font-size: 0.875em;
+  font-weight: 520;
+  padding: 0.571em 0.786em;
+}
+.icon-button:not(:disabled):hover,
+.icon-button:not(:disabled):focus-visible,
+.plain-button:not(:disabled):hover,
+.plain-button:not(:disabled):focus-visible {
+  border-color: color-mix(in srgb, var(--accent) 40%, Canvas 60%);
+  background: color-mix(in srgb, var(--accent) 9%, Canvas 91%);
+  outline: none;
+}
+.search {
+  width: 100%;
+  border: thin solid var(--line);
+  border-radius: 0.5em;
+  padding: 0.563em 0.688em;
+  background: Canvas;
+  color: CanvasText;
+}
+.kinds {
+  margin-top: 0.875em;
+}
+.kind + .kind {
+  margin-top: 0.5em;
+}
+.kind {
+  font-size: 0.875em;
+}
+.kind strong,
+.kind span {
+  display: inline-block;
+  width: 50%;
+  vertical-align: top;
+}
+.kind span {
+  text-align: right;
+}
+.nodes {
+  max-height: 32.5em;
+  overflow: auto;
+  padding-right: 0.25em;
+}
+.nodes > * + * {
+  margin-top: 0.5em;
+}
+.node-button {
+  width: 100%;
+  border: thin solid transparent;
+  border-radius: 0.5em;
+  padding: 0.625em;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+.node-button:hover,
+.node-button:focus-visible {
+  border-color: color-mix(in srgb, var(--accent) 40%, Canvas 60%);
+  background: color-mix(in srgb, var(--accent) 9%, Canvas 91%);
+  outline: none;
+}
+.node-button.is-active {
+  border-color: color-mix(in srgb, var(--accent) 44%, Canvas 56%);
+  background: var(--accent-soft);
+}
+.node-title {
+  margin-bottom: 0.25em;
+  font-family: var(--font-display);
+  font-weight: 650;
+  text-align: right;
+}
+.node-title-main {
+  display: inline-block;
+  width: 70%;
+  padding-right: 0.375rem;
+  overflow-wrap: anywhere;
+  text-align: left;
+  vertical-align: top;
+  font-size: 0.875rem;
+}
+.node-title-kind {
+  display: inline-block;
+  width: 30%;
+  text-align: right;
+  vertical-align: top;
+}
+.node-title .tag {
+  max-width: 100%;
+  text-align: center;
+  vertical-align: top;
+}
+.tag {
+  display: inline-block;
+  border: thin solid color-mix(in srgb, var(--tag-stroke, CanvasText) 34%, Canvas 66%);
+  border-radius: 999em;
+  padding: 0.167em 0.667em;
+  background: var(--tag-fill, color-mix(in srgb, CanvasText 8%, Canvas 92%));
+  color: var(--tag-stroke, color-mix(in srgb, CanvasText 68%, Canvas 32%));
+  font-family: var(--font-display);
+  font-size: 0.75em;
+  font-weight: 600;
+}
+.icon {
+  width: 0.938em;
+  height: 0.938em;
+  display: inline-block;
+  margin-right: 0.438em;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+  vertical-align: -0.188em;
+}
+.graph-wrap {
+  display: inline-block;
+  width: 76%;
+  padding-right: 1.125em;
+  font-size: 1rem;
+  vertical-align: top;
+}
+.graph-wrap > * + * {
+  margin-top: 0.75em;
+}
+.graph-header > div:first-child {
+  display: inline-block;
+  width: 70%;
+  vertical-align: middle;
+}
+.graph-actions {
+  display: inline-block;
+  width: 30%;
+  text-align: right;
+  vertical-align: middle;
+}
+.graph-actions > * + * {
+  margin-left: 0.5em;
+}
+.graph {
+  position: relative;
+  width: 100%;
+  min-height: 45em;
+  max-height: 45em;
+  border: thin solid var(--line);
+  border-radius: 0.5em;
+  background:
+    linear-gradient(color-mix(in srgb, CanvasText 9%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, CanvasText 9%, transparent) 1px, transparent 1px),
+    Canvas;
+  background-size: 4.5em 4.5em;
+  overflow: auto;
+  touch-action: pan-x pan-y;
+}
+.graph svg {
+  display: block;
+  width: auto;
+  min-width: 100%;
+  height: auto;
+  min-height: 45em;
+  max-width: none;
+}
+.edge {
+  fill: none;
+  pointer-events: none;
+  stroke: var(--active-edge, var(--accent));
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.graph-node {
+  cursor: pointer;
+  transition: opacity 160ms ease;
+}
+.graph-node.is-far {
+  opacity: 0.28;
+}
+.graph-node.is-neighbor {
+  opacity: 0.86;
+}
+.graph-node.is-search-match {
+  opacity: 1;
+}
+.node-halo {
+  fill: var(--node-stroke);
+  opacity: 0;
+  pointer-events: none;
+}
+.graph-node.is-isolated .node-halo {
+  opacity: 0.24;
+}
+.graph-node.is-isolated .node-core {
+  fill: color-mix(in srgb, Canvas 72%, var(--node-fill) 28%);
+  stroke-dasharray: 4 3;
+  stroke-width: 2.8;
+}
+.graph-node.is-isolated .graph-label {
+  font-size: 0.9375em;
+  opacity: 0.82;
+}
+.graph-node.is-neighbor .node-halo {
+  opacity: 0.1;
+}
+.graph-node.is-active .node-halo {
+  opacity: 0.18;
+}
+.node-core {
+  fill: var(--node-fill);
+  shape-rendering: geometricPrecision;
+  stroke: var(--node-stroke);
+  stroke-width: 1.8;
+}
+.graph-node:hover .node-core,
+.graph-node.is-active .node-core {
+  stroke: var(--node-stroke);
+  stroke-width: 4;
+}
+.graph-label {
+  fill: var(--strong);
+  font-size: 0.875em;
+  font-weight: 650;
+  opacity: 0;
+  paint-order: stroke;
+  pointer-events: none;
+  stroke: Canvas;
+  stroke-linejoin: round;
+  stroke-width: 0.375em;
+}
+.graph-label.is-visible,
+.graph-node:hover .graph-label {
+  opacity: 1;
+}
+.graph-label.is-active {
+  font-size: 1em;
+}
+.graph-label.is-cluster-hub {
+  font-size: 1.125em;
+  font-weight: 800;
+}
+.graph-focus {
+  min-height: 3.25em;
+  border: thin solid color-mix(in srgb, CanvasText 12%, Canvas 88%);
+  border-radius: 0.5em;
+  padding: 0.625em 0.75em;
+  background: var(--surface-raised);
+  cursor: pointer;
+  text-align: right;
+}
+.graph-focus:hover,
+.graph-focus:focus-visible {
+  border-color: color-mix(in srgb, var(--accent) 40%, Canvas 60%);
+  background: color-mix(in srgb, var(--accent) 9%, Canvas 91%);
+  outline: none;
+}
+.graph-focus-main {
+  display: inline-block;
+  width: 70%;
+  text-align: left;
+  vertical-align: middle;
+}
+.graph-focus-tag {
+  display: inline-block;
+  width: 30%;
+  padding-left: 0.75rem;
+  text-align: right;
+  vertical-align: middle;
+}
+.graph-focus-action {
+  display: inline-block;
+  max-width: 100%;
+  border-radius: 0.5em;
+  padding: 0.333em 0.583em;
+  background: Canvas;
+  color: var(--strong);
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 650;
+  text-align: center;
+  white-space: nowrap;
+}
+.graph-focus-action:hover,
+.graph-focus:hover .graph-focus-action,
+.graph-focus:focus-visible .graph-focus-action {
+  border-color: color-mix(in srgb, var(--accent) 40%, Canvas 60%);
+  background: color-mix(in srgb, var(--accent) 9%, Canvas 91%);
+}
+.graph-focus strong {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 650;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.graph-focus span {
+  color: var(--muted);
+  font-size: 0.813rem;
+}
+.graph-focus .tag {
+  max-width: 100%;
+  color: var(--tag-stroke, color-mix(in srgb, CanvasText 68%, Canvas 32%));
+  font-size: 0.75rem;
+  text-align: center;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.detail {
+  display: inline-block;
+  width: 24%;
+  min-height: 0;
+  overflow: auto;
+  font-size: 1rem;
+  vertical-align: top;
+}
+.detail,
+.detail * {
+  min-width: 0;
+}
+.search-popover {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: none;
+  padding: 5.5em 1em 1.5em;
+  background: color-mix(in srgb, Canvas 72%, transparent);
+  backdrop-filter: blur(0.625em);
+  text-align: center;
+}
+.search-popover.is-open {
+  display: block;
+}
+.content-popover {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  display: none;
+  padding: 5.5em 1em 1.5em;
+  background: color-mix(in srgb, Canvas 70%, transparent);
+  backdrop-filter: blur(0.625em);
+  text-align: center;
+}
+.content-popover.is-open {
+  display: block;
+}
+.launch-popover {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: none;
+  padding: 5.5em 1em 1.5em;
+  background: color-mix(in srgb, Canvas 70%, transparent);
+  backdrop-filter: blur(0.625em);
+  text-align: center;
+}
+.launch-popover.is-open {
+  display: block;
+}
+.search-card {
+  width: min(35em, 100%);
+  max-height: 82vh;
+  overflow: auto;
+  display: inline-block;
+  border: thin solid var(--line);
+  border-radius: 0.5em;
+  padding: 1em;
+  background: Canvas;
+  box-shadow: 0 1.25em 4.375em color-mix(in srgb, CanvasText 18%, transparent);
+  text-align: left;
+  vertical-align: top;
+}
+.search-card,
+.search-card * {
+  min-width: 0;
+}
+.content-card {
+  width: min(39em, 100%);
+  max-height: 82vh;
+  overflow: auto;
+  display: inline-block;
+  border: thin solid color-mix(in srgb, CanvasText 12%, Canvas 88%);
+  border-radius: 0.5em;
+  padding: 1em;
+  background: Canvas;
+  box-shadow: 0 1.25em 4.375em color-mix(in srgb, CanvasText 16%, transparent);
+  text-align: left;
+  vertical-align: top;
+}
+.content-card-head {
+  display: block;
+  text-align: right;
+}
+.content-card-title {
+  display: inline-block;
+  width: 70%;
+  padding-right: 0.75em;
+  text-align: left;
+  vertical-align: middle;
+}
+.content-card-close {
+  display: inline-block;
+  width: 30%;
+  text-align: right;
+  vertical-align: middle;
+}
+.search-card-head {
+  display: block;
+  text-align: right;
+}
+.search-card-title {
+  display: inline-block;
+  width: 70%;
+  padding-right: 0.75em;
+  text-align: left;
+  vertical-align: middle;
+}
+.search-card-close {
+  display: inline-block;
+  width: 30%;
+  text-align: right;
+  vertical-align: middle;
+}
+.search-card-head h2,
+.content-card-head h2 {
+  font-size: 1.063em;
+}
+.search-card-head .icon-button,
+.content-card-head .icon-button {
+  vertical-align: middle;
+}
+.search-card-head .icon-button:hover,
+.search-card-head .icon-button:focus-visible,
+.content-card-head .icon-button:hover,
+.content-card-head .icon-button:focus-visible {
+  border-color: color-mix(in srgb, #dc2626 52%, Canvas 48%);
+  background: color-mix(in srgb, #dc2626 10%, Canvas 90%);
+  color: color-mix(in srgb, #dc2626 84%, CanvasText 16%);
+}
+.search-card > * + * {
+  margin-top: 0.75em;
+}
+.content-card > * + * {
+  margin-top: 0.75em;
+}
+.search-card .nodes {
+  max-height: calc(82vh - 8.25em);
+}
+.search-card .node-button p,
+.search-card .node-meta,
+.search-card .tag {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+.detail-head {
+  display: block;
+}
+.detail-head > * + * {
+  margin-top: 0.5em;
+}
+.content-head {
+  display: block;
+  margin-bottom: 0.625em;
+  text-align: right;
+}
+.content-head h3 {
+  display: inline-block;
+  width: 58%;
+  text-align: left;
+  vertical-align: middle;
+}
+.content-head-action {
+  display: inline-block;
+  width: 42%;
+  text-align: right;
+  vertical-align: middle;
+}
+.content-detail-button {
+  display: inline-block;
+  width: 100%;
+  border: thin solid color-mix(in srgb, CanvasText 14%, Canvas 86%);
+  border-radius: 0.5em;
+  padding: 0.417em 0.583em;
+  background: Canvas;
+  color: var(--strong);
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: 0.75em;
+  font-weight: 650;
+  text-align: center;
+  vertical-align: middle;
+}
+.content-detail-button:hover,
+.content-detail-button:focus-visible {
+  border-color: color-mix(in srgb, var(--accent) 40%, Canvas 60%);
+  background: color-mix(in srgb, var(--accent) 9%, Canvas 91%);
+  outline: none;
+}
+.detail-title strong {
+  display: block;
+  width: 100%;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 650;
+  line-height: 1.2;
+  overflow-wrap: anywhere;
+  text-align: left;
+}
+.detail-title-kind {
+  display: block;
+  margin-top: 0.5em;
+  text-align: left;
+}
+.detail-title .tag {
+  max-width: 100%;
+  white-space: normal;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+.priority-badge {
+  display: inline-block;
+  max-width: 100%;
+  margin-left: 0.5em;
+  padding: 0.28em 0.55em;
+  border: 1px solid color-mix(in srgb, var(--muted) 24%, Canvas 76%);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--muted) 7%, Canvas 93%);
+  color: var(--strong);
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  font-weight: 650;
+  line-height: 1;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+.priority-badge-icon,
+.priority-badge-label {
+  display: inline-block;
+  line-height: 1;
+  vertical-align: middle;
+}
+.priority-badge-label {
+  padding-top: 0.05em;
+}
+.priority-badge-icon {
+  width: 0.9em;
+  height: 0.9em;
+  margin-right: 0.35em;
+}
+.priority-badge-compact {
+  max-width: 4.75em;
+  margin-left: 0;
+  padding: 0.18em 0.42em;
+  font-size: 0.917em;
+}
+.priority-badge-compact .priority-badge-icon {
+  width: 0.82em;
+  height: 0.82em;
+  margin-right: 0.25em;
+}
+.priority-badge-shape {
+  fill: color-mix(in srgb, var(--strong) 16%, Canvas 84%);
+  stroke: var(--strong);
+  stroke-width: 1.4;
+  vector-effect: non-scaling-stroke;
+}
+.detail p,
+.detail code,
+.content-list li {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+.relation-list button {
+  max-width: 100%;
+}
+.relation-list,
+.latest-list,
+.deadline-list,
+.activity-list {
+  margin: 0;
+  list-style: none;
+}
+.content-list {
+  margin: 0;
+  padding-left: 1.125em;
+  list-style: disc;
+  list-style-position: outside;
+}
+.relation-list,
+.latest-list,
+.deadline-list,
+.activity-list {
+  padding: 0;
+}
+.content-list > * + *,
+.relation-list > * + *,
+.latest-list > * + *,
+.deadline-list > * + *,
+.activity-list > * + * {
+  margin-top: 0.5em;
+}
+.relation-list button,
+.latest-list button,
+.deadline-list button,
+.activity-list button,
+.activity-item {
+  width: 100%;
+  border: thin solid color-mix(in srgb, CanvasText 10%, Canvas 90%);
+  border-radius: 0.5em;
+  padding: 0.563em 0.625em;
+  background: var(--surface);
+  text-align: left;
+}
+.content-list li {
+  padding-left: 0.125em;
+  color: var(--strong);
+  font-size: 0.813em;
+  line-height: 1.35;
+  white-space: nowrap;
+}
+.relation-list button,
+.latest-list button,
+.deadline-list button,
+.activity-list button {
+  cursor: pointer;
+}
+.activity-item {
+  display: block;
+}
+.relation-list button {
+  display: block;
+  min-height: 0;
+  border-color: transparent;
+  padding: 0.385em 0;
+  background: transparent;
+  font-size: 0.813em;
+  line-height: 1.25;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.latest-list button,
+.deadline-list button,
+.activity-list button,
+.activity-item {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.relation-list button:hover,
+.latest-list button:hover,
+.deadline-list button:hover,
+.activity-list button:hover {
+  border-color: color-mix(in srgb, var(--accent) 40%, Canvas 60%);
+  background: color-mix(in srgb, var(--accent) 9%, Canvas 91%);
+}
+.relation-list button:hover {
+  background: color-mix(in srgb, var(--accent) 9%, transparent);
+}
+.relation-list .relation-type {
+  display: inline-block;
+  width: 24%;
+  color: var(--muted);
+  font-size: 0.923em;
+  font-weight: 650;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+.relation-importance {
+  display: inline-block;
+  width: 18%;
+  border: thin solid color-mix(in srgb, #f43f5e 16%, Canvas 84%);
+  border-radius: 999em;
+  padding: 0.1em 0.5em;
+  background: color-mix(in srgb, #f43f5e 6%, Canvas 94%);
+  color: color-mix(in srgb, #f43f5e 55%, CanvasText 45%);
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  font-weight: 650;
+  text-align: center;
+  vertical-align: middle;
+}
+.relation-importance svg {
+  width: 1em;
+  height: 1em;
+  margin-right: 0.3em;
+  vertical-align: -0.15em;
+  fill: currentColor;
+}
+  margin-right: 0.3em;
+  vertical-align: -0.15em;
+  fill: currentColor;
+}
+.icon-button:disabled,
+.plain-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.relation-kind {
+  display: inline-block;
+  width: 23%;
+  padding-left: 0.625em;
+  vertical-align: middle;
+}
+.relation-kind .tag {
+  max-width: 100%;
+  font-size: 0.846em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+.latest-list .relation-type {
+  display: inline-block;
+  margin-right: 0.667em;
+  color: var(--muted);
+  font-size: 0.75em;
+  font-weight: 650;
+  vertical-align: baseline;
+}
+.deadline-date {
+  display: inline-block;
+  width: 30%;
+  color: color-mix(in srgb, var(--muted) 86%, CanvasText 14%);
+  font-size: 0.75em;
+  font-weight: 750;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+.deadline-title {
+  display: inline-block;
+  width: 42%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+.deadline-priority {
+  display: inline-block;
+  width: 16%;
+  color: var(--muted);
+  font-size: 0.75em;
+  font-weight: 650;
+  overflow: hidden;
+  text-align: right;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+.deadline-priority .priority-badge {
+  color: var(--strong);
+}
+.deadline-list .activity-agent {
+  width: 12%;
+}
+.deadline-item-overdue {
+  border-color: color-mix(in srgb, var(--red) 42%, Canvas 58%);
+  background: color-mix(in srgb, var(--red) 12%, Canvas 88%);
+  color: color-mix(in srgb, var(--red) 82%, CanvasText 18%);
+}
+.deadline-item-overdue .deadline-date,
+.deadline-item-overdue .deadline-title,
+.deadline-item-overdue .deadline-priority,
+.deadline-item-overdue .priority-badge {
+  color: inherit;
+}
+.deadline-list button.deadline-item-overdue:hover,
+.deadline-list button.deadline-item-overdue:focus-visible {
+  border-color: color-mix(in srgb, var(--red) 54%, Canvas 46%);
+  background: color-mix(in srgb, var(--red) 16%, Canvas 84%);
+}
+.deadline-item-completed {
+  border-color: color-mix(in srgb, var(--green) 22%, Canvas 78%);
+  background: color-mix(in srgb, var(--green) 5%, Canvas 95%);
+}
+.deadline-list button.deadline-item-completed:hover,
+.deadline-list button.deadline-item-completed:focus-visible {
+  border-color: color-mix(in srgb, var(--green) 32%, Canvas 68%);
+  background: color-mix(in srgb, var(--green) 8%, Canvas 92%);
+}
+.completed-group {
+  margin-top: 1.5em;
+}
+.completed-group h3 {
+  margin: 0 0 0.875em;
+  color: CanvasText;
+  font-size: 1.063em;
+  letter-spacing: 0;
+}
+.completed-date {
+  color: color-mix(in srgb, var(--muted) 86%, CanvasText 14%);
+}
+.relation-title {
+  display: inline-block;
+  width: 40%;
+  padding-left: 0.75em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+.content-text {
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: top;
+  white-space: nowrap;
+}
+.content-list .content-text {
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+.content-detail-list {
+  margin: 0;
+  padding-left: 1.125em;
+  list-style: disc;
+  color: var(--strong);
+}
+.content-detail-list > * + * {
+  margin-top: 0.625em;
+}
+.content-detail-list li {
+  line-height: 1.45;
+}
+.content-detail-title {
+  margin: 0 0 1.125em;
+  font-family: var(--font-display);
+  font-size: 1.375em;
+  font-weight: 650;
+  line-height: 1.2;
+  color: var(--strong);
+}
+.content-detail-separator {
+  height: 0;
+  margin: 0 0 1.125em;
+  border: 0;
+  border-top: thin solid color-mix(in srgb, CanvasText 12%, Canvas 88%);
+}
+.section-stack {
+  display: block;
+}
+.content-section {
+  margin: 3em 0;
+}
+.relations-section h3 {
+  margin-bottom: 0.625em;
+}
+.latest-section {
+  margin-top: 1.5em;
+}
+.latest-section > .panel {
+  display: inline-block;
+  width: 35%;
+  font-size: 1rem;
+  vertical-align: top;
+}
+.latest-section > .history-panel {
+  width: 63%;
+}
+.launch-card {
+  width: min(42em, 100%);
+  max-height: 82vh;
+  overflow: auto;
+  display: inline-block;
+  border: thin solid color-mix(in srgb, CanvasText 12%, Canvas 88%);
+  border-radius: 0.5em;
+  padding: 1em;
+  background: Canvas;
+  box-shadow: 0 1.25em 4.375em color-mix(in srgb, CanvasText 16%, transparent);
+  text-align: left;
+  vertical-align: top;
+}
+.launch-card > * + * {
+  margin-top: 0.75em;
+}
+.launch-value {
+  display: block;
+  width: 100%;
+  border: thin solid color-mix(in srgb, CanvasText 12%, Canvas 88%);
+  border-radius: 0.5em;
+  padding: 0.625em;
+  background: var(--surface);
+  color: var(--strong);
+  font-family: var(--font-mono);
+  font-size: 0.75em;
+  overflow-wrap: anywhere;
+}
+.launch-row > * + * {
+  margin-top: 0.375em;
+}
+.latest-section > .panel + .panel {
+  margin-left: 2%;
+}
+.latest-section h2 {
+  margin-bottom: 0.875em;
+}
+.app-footer {
+  margin-top: 1.25em;
+  padding-top: 0.875em;
+  border-top: thin solid var(--line);
+  text-align: right;
+}
+.app-footer > * + * {
+  margin-left: 0.625em;
+}
+.history-panel {
+  max-height: 38em;
+}
+.activity-list {
+  max-height: 31em;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding-right: 0.25em;
+}
+.activity-action {
+  display: inline-block;
+  width: 14%;
+  font-size: 0.75em;
+  font-weight: 800;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+.activity-agent {
+  position: relative;
+  display: inline-block;
+  width: 9%;
+  min-width: 2.5em;
+  height: 1.75em;
+  overflow: hidden;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+.activity-agent img,
+.activity-agent-fallback {
+  display: inline-block;
+  width: 1.75em;
+  height: 1.75em;
+  border: thin solid color-mix(in srgb, CanvasText 14%, Canvas 86%);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 8%, Canvas 92%);
+  vertical-align: middle;
+}
+.activity-agent img {
+  position: relative;
+  z-index: 1;
+  object-fit: contain;
+  padding: 0.188em;
+}
+.activity-agent-fallback {
+  position: absolute;
+  display: none;
+  left: 0;
+  top: 0;
+  color: var(--accent-strong);
+  font-size: 0.688em;
+  font-weight: 900;
+  line-height: 2.45;
+  text-align: center;
+}
+.activity-action-create {
+  color: var(--green);
+}
+.activity-action-update,
+.activity-action-merge,
+.activity-action-update_relation,
+.activity-action-relate {
+  color: var(--accent);
+}
+.activity-action-archive,
+.activity-action-delete,
+.activity-action-delete_relation {
+  color: var(--amber);
+}
+.activity-clickable {
+  border-color: color-mix(in srgb, var(--accent) 18%, Canvas 82%);
+  background: color-mix(in srgb, var(--accent) 4%, Canvas 96%);
+}
+.activity-clickable:hover,
+.activity-clickable:focus-visible {
+  border-color: color-mix(in srgb, var(--accent) 48%, Canvas 52%);
+  background: color-mix(in srgb, var(--accent) 9%, Canvas 91%);
+  outline: none;
+}
+.activity-static {
+  border-color: color-mix(in srgb, CanvasText 12%, Canvas 88%);
+  border-style: dashed;
+  background: transparent;
+  color: var(--muted);
+}
+.activity-title {
+  display: inline-block;
+  width: 29%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+.activity-meta {
+  display: inline-block;
+  width: 12%;
+  padding-left: 0.625em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+.activity-kind {
+  display: inline-block;
+  width: 14%;
+  padding-left: 0.625em;
+  color: var(--muted);
+  font-family: var(--font-display);
+  font-size: 0.813em;
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+.activity-kind .tag {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+.activity-meta .priority-badge {
+  vertical-align: middle;
+}
+.activity-date {
+  display: inline-block;
+  width: 18%;
+  color: var(--muted);
+  font-size: 0.75em;
+  font-weight: 650;
+  overflow: hidden;
+  text-align: right;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+.activity-relation-title span {
+  display: inline-block;
+  max-width: 30%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+.activity-relation-title .activity-arrow {
+  width: 1.75em;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-weight: 800;
+  text-align: center;
+}
+.activity-relation-title .activity-relation-type {
+  max-width: 24%;
+  margin-left: 0.5em;
+  color: var(--muted);
+  font-size: 0.833em;
+  font-weight: 700;
+}
+.empty {
+  padding: 0.875em;
+  border-radius: 0.5em;
+  background: var(--surface);
+}
+code {
+  font-family: var(--font-mono);
+  font-size: 0.75em;
+  color: var(--muted);
+}
+@media (max-width: 61.25em) {
+  .intro-text,
+  .metrics,
+  .graph-wrap,
+  .detail,
+  .latest-section > .panel {
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+  }
+  .metrics,
+  .detail,
+  .latest-section > .panel + .panel {
+    margin-left: 0;
+    margin-top: 1.125em;
+  }
+  .graph-wrap {
+    padding-right: 0;
+  }
+}
+@media (max-width: 40em) {
+  main {
+    width: 100%;
+    padding: 1.5em 0.688em;
+  }
+  .metric,
+  .metric + .metric {
+    width: 48%;
+    margin-left: 0;
+    padding: 0.5em 0.625em;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.375em;
+  }
+  .metric + .metric {
+    margin-left: 4%;
+    margin-top: 0;
+  }
+  .metric strong {
+    font-size: 1.375em;
+    display: inline;
+  }
+  .latest-section > .panel + .panel {
+    margin-left: 0;
+    margin-top: 1.125em;
+  }
+  .graph-header > div:first-child,
+  .graph-actions,
+  .graph-focus-main,
+  .graph-focus-tag,
+  .detail-title strong,
+  .detail-title-kind,
+  .content-head h3,
+  .content-head-action {
+    display: block;
+    width: 100%;
+    padding-left: 0;
+    padding-right: 0;
+    text-align: left;
+  }
+  .graph-actions,
+  .graph-focus-tag,
+  .detail-title-kind,
+  .content-head-action {
+    margin-top: 0.625em;
+  }
+  .graph-actions > * + * {
+    margin-left: 0.5em;
+  }
+  .graph-focus-action,
+  .content-detail-button {
+    width: auto;
+    max-width: 100%;
+  }
+  .content-list li {
+    white-space: normal;
+  }
+  .relation-type,
+  .relation-importance,
+  .relation-kind,
+  .relation-title {
+    display: inline-block;
+    margin-top: 0.25em;
+  }
+  .graph,
+  .graph svg {
+    min-height: 22.5em;
+  }
+  .graph {
+    max-height: 26.25em;
+  }
+}

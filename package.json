@@ -1,0 +1,14 @@
+{
+  "name": "second-brain-mcp",
+  "version": "0.1.0",
+  "description": "Web MCP connector for a JSON-based second brain, deployable on Vercel.",
+  "type": "module",
+  "scripts": {
+    "dev": "node server.local.js",
+    "test": "node --test",
+    "check": "node --check api/index.js && node --check api/mcp.js && node --check api/assets/styles.css.js && node --check api/assets/view.js.js && node --check server.local.js && node --check src/asset-handler.js && node --check src/brain-store.js && node --check src/env.js && node --check src/index-page.js && node --check src/mcp-handler.js && node --check src/security.js && node --check src/view/asset-path.js && node --check src/view/assets/view.js"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}
