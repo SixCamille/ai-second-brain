@@ -19,9 +19,9 @@ Ce guide décrit le parcours complet pour installer AI Second Brain depuis l'int
 6. Garder le root directory sur `./`.
 7. Cliquer sur `Deploy`.
 
-![Vercel new project settings](docs/assets/setup/01-vercel-new-project.png)
-
 ![Deploy from GitHub URL](docs/assets/setup/02-vercel-deploy-from-github.png)
+
+![Vercel new project settings](docs/assets/setup/01-vercel-new-project.png)
 
 Vercel crée un premier déploiement et affiche une page de confirmation.
 
