@@ -57,6 +57,10 @@ export function sendViewLogin(response, { invalid = false } = {}) {
   sendHtml(response, invalid ? 401 : 200, renderLoginPage({ invalid }));
 }
 
+export function sendMissingRedisRequired(response) {
+  sendHtml(response, 503, renderMissingRedisRequiredPage());
+}
+
 export function getViewSecurityInfo() {
   return {
     requires_view_password: requiresViewPassword(),
@@ -393,7 +397,7 @@ function renderSetupRequiredPage() {
     <main>
       <h1>Initialize AI Second Brain</h1>
       <p class="hint">The view is protected by default. Choose a password, then copy the generated variables into the Vercel environment that serves this URL.</p>
-      <p class="hint">Need persistent memory? <a class="action-link" href="https://vercel.com/marketplace/upstash" target="_blank" rel="noreferrer">Install Upstash Redis on Vercel</a>, then create a new deployment after Vercel adds the Redis variables.</p>
+      <p class="hint">Redis is required on Vercel. <a class="action-link" href="https://vercel.com/marketplace/upstash" target="_blank" rel="noreferrer">Install Upstash Redis on Vercel</a>, then create a new deployment after Vercel adds the Redis variables.</p>
       <label for="view-url">View URL</label>
       <input id="view-url" type="url" value="${setupDefaultViewUrl()}">
       <label for="password">View password</label>
@@ -476,6 +480,72 @@ function renderSetupRequiredPage() {
         }
       })();
     </script>
+  </body>
+</html>`;
+}
+
+function renderMissingRedisRequiredPage() {
+  return `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AI Second Brain Setup Required</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        font-family: "Segoe UI Variable Text", Aptos, Inter, ui-sans-serif, system-ui, sans-serif;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        min-height: 100vh;
+        margin: 0;
+        padding: 1rem;
+        background: Canvas;
+        color: CanvasText;
+        text-align: center;
+      }
+      main {
+        width: min(42rem, calc(100% - 2rem));
+        display: inline-block;
+        margin-top: 12vh;
+        padding: 1.125rem;
+        border: thin solid color-mix(in srgb, CanvasText 14%, Canvas 86%);
+        border-radius: 0.5rem;
+        background: color-mix(in srgb, CanvasText 3%, Canvas 97%);
+        text-align: left;
+      }
+      h1 {
+        margin: 0 0 0.75rem;
+        font-size: 1.25rem;
+      }
+      p,
+      li {
+        color: color-mix(in srgb, CanvasText 72%, Canvas 28%);
+      }
+      code {
+        padding: 0.125rem 0.25rem;
+        border-radius: 0.25rem;
+        background: color-mix(in srgb, CanvasText 8%, Canvas 92%);
+      }
+      a {
+        color: #2563eb;
+        font-weight: 650;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Redis is required on Vercel</h1>
+      <p>AI Second Brain needs Redis/KV storage for runtime writes on Vercel. The current deployment cannot see Redis environment variables, so the graph cannot be loaded safely.</p>
+      <ol>
+        <li><a href="https://vercel.com/marketplace/upstash" target="_blank" rel="noreferrer">Install Upstash Redis on Vercel</a> and attach it to this project.</li>
+        <li>Confirm Vercel added <code>UPSTASH_REDIS_REST_URL</code> and <code>UPSTASH_REDIS_REST_TOKEN</code>, or <code>KV_REST_API_URL</code> and <code>KV_REST_API_TOKEN</code>.</li>
+        <li>Create a new deployment, then reopen this page.</li>
+      </ol>
+    </main>
   </body>
 </html>`;
 }

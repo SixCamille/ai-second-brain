@@ -31,7 +31,7 @@ Redis/KV credentials are not copied as files. They are deployment environment va
 For a fresh Vercel deployment:
 
 1. Import or create the new Git repository in Vercel.
-2. Attach a Vercel KV or Upstash Redis database if persistent cloud memory is needed.
+2. Attach a Vercel KV or Upstash Redis database. This is required for a working Vercel deployment.
 3. Add one supported Redis REST variable pair to the Vercel environment:
 
 ```text
@@ -46,7 +46,7 @@ UPSTASH_REDIS_REST_URL=...
 UPSTASH_REDIS_REST_TOKEN=...
 ```
 
-The initialization screen includes an **Install Upstash Redis on Vercel** link. Use it to attach Redis from the browser, then create a new deployment after Vercel adds the Redis environment variables.
+The initialization screen includes an **Install Upstash Redis on Vercel** link. Use it to attach Redis from the browser before using the deployed app, then create a new deployment after Vercel adds the Redis environment variables.
 
 4. Deploy once.
 5. Open the deployed view. The initialization screen appears when no view password is configured.
@@ -62,7 +62,7 @@ BRAIN_VIEW_PASSWORD_HASH=...
 
 After the new deployment starts, opening the view should show the password login screen, not the initialization screen. A fresh or empty memory graph is normal after login. If the initialization screen still appears, the running deployment cannot see any view password variable. Check that `BRAIN_VIEW_PASSWORD_HASH` was added to the right Vercel environment (`Production` for the production URL, `Preview` for preview URLs), that the value starts with `sha256:`, and that the deployment was created after the variable was saved.
 
-When either Redis REST pair is present, AI Second Brain automatically uses Redis/KV for objects, events, user instructions, and mutable kind configuration. Without those variables, local development falls back to repository folders for runtime memory.
+When either Redis REST pair is present, AI Second Brain automatically uses Redis/KV for objects, events, user instructions, and mutable kind configuration. Without those variables, only local development should use repository folders for runtime memory.
 
 ## What A Fresh Instance Contains
 
@@ -77,7 +77,7 @@ A new instance can start with only:
 - `rules/kinds.json`
 - `config.json`
 
-The `objects/` and `events/` folders are optional for a blank local brain. They are created automatically by the file adapter when the server starts locally. On Vercel, persistent objects and events are stored in REST KV when KV environment variables are configured.
+The `objects/` and `events/` folders are optional for a blank local brain. They are created automatically by the file adapter when the server starts locally. On Vercel, objects and events must be stored in REST KV.
 
 If you copy an existing private instance, check that `rules/user_instructions.md` does not contain personal preferences before publishing it.
 

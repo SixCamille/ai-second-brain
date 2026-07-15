@@ -4,7 +4,8 @@ import { sendStaticAsset } from "./src/asset-handler.js";
 import { BrainStore } from "./src/brain-store.js";
 import { renderIndexPage } from "./src/index-page.js";
 import { createMcpHandler } from "./src/mcp-handler.js";
-import { handleViewLogin, isViewAuthorized, sendViewLogin } from "./src/security.js";
+import { missingRequiredRedisOnVercel } from "./src/runtime-requirements.js";
+import { handleViewLogin, isViewAuthorized, sendMissingRedisRequired, sendViewLogin } from "./src/security.js";
 
 loadLocalEnv();
 
@@ -31,6 +32,10 @@ const server = http.createServer(async (request, response) => {
   if (url.pathname === "/") {
     if (!isViewAuthorized(request)) {
       sendViewLogin(response);
+      return;
+    }
+    if (missingRequiredRedisOnVercel()) {
+      sendMissingRedisRequired(response);
       return;
     }
     const store = await BrainStore.create();

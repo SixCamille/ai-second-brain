@@ -1,6 +1,7 @@
 import { BrainStore } from "../src/brain-store.js";
 import { renderIndexPage } from "../src/index-page.js";
-import { handleViewLogin, isViewAuthorized, sendViewLogin } from "../src/security.js";
+import { missingRequiredRedisOnVercel } from "../src/runtime-requirements.js";
+import { handleViewLogin, isViewAuthorized, sendMissingRedisRequired, sendViewLogin } from "../src/security.js";
 
 export default async function handler(request, response) {
   if (request.method === "POST") {
@@ -9,6 +10,10 @@ export default async function handler(request, response) {
   }
   if (!isViewAuthorized(request)) {
     sendViewLogin(response);
+    return;
+  }
+  if (missingRequiredRedisOnVercel()) {
+    sendMissingRedisRequired(response);
     return;
   }
   const store = await BrainStore.create();

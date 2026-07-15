@@ -46,7 +46,7 @@ npm install
 On Windows PowerShell, use `npm.cmd install` if script execution policy blocks `npm`.
 
 3. Create a Vercel project from the repository.
-4. Add REST KV variables if memory should persist in the cloud:
+4. Add REST KV variables. They are required for a working Vercel deployment:
 
 ```text
 KV_REST_API_URL=...
@@ -200,7 +200,11 @@ rules/
 
 The `objects/` and `events/` directories are user data, not source code. They are intentionally ignored by git in a public template-style repository.
 
-On Vercel, the filesystem is not durable storage for writes. The server automatically switches to REST KV storage when these variables are present:
+On Vercel, Redis/KV storage is required. Serverless deployments cannot rely on repository folders for runtime writes, so a Vercel deployment without Redis/KV variables may fail when the app tries to create objects, events, user instructions, or kind configuration.
+
+When Redis/KV is missing on Vercel, the web view shows a setup error with the Upstash Marketplace link instead of a generic 500.
+
+The server automatically switches to REST KV storage when these variables are present:
 
 ```text
 KV_REST_API_URL
@@ -214,7 +218,7 @@ UPSTASH_REDIS_REST_URL
 UPSTASH_REDIS_REST_TOKEN
 ```
 
-The initialization screen includes a direct **Install Upstash Redis on Vercel** link to the Vercel Marketplace. Use it to attach a Redis store to the Vercel project from the browser. After Vercel adds the Redis environment variables, create a new deployment so the running app can see them.
+The initialization screen includes a direct **Install Upstash Redis on Vercel** link to the Vercel Marketplace. Use it to attach a Redis store to the Vercel project from the browser before using the deployed app. After Vercel adds the Redis environment variables, create a new deployment so the running app can see them.
 
 ## Web Setup
 
@@ -258,7 +262,7 @@ curl -X POST http://localhost:3000/mcp \
 ## Vercel Deployment
 
 1. Create a Vercel project from this repository.
-2. Configure REST KV variables if memory should persist in the cloud.
+2. Configure REST KV variables. This is required for Vercel deployments.
 3. Configure `ALLOWED_ORIGINS` with allowed origins separated by commas, for example:
 
 ```text

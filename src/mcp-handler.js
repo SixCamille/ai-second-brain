@@ -1,5 +1,6 @@
 import { createHash, randomUUID } from "node:crypto";
 import { BrainStore, McpError } from "./brain-store.js";
+import { missingRedisMessage, missingRequiredRedisOnVercel } from "./runtime-requirements.js";
 import { getViewSecurityInfo, isMcpRequestAuthorized } from "./security.js";
 
 const PROTOCOL_VERSION = "2025-06-18";
@@ -584,6 +585,10 @@ export function createMcpHandler({ storeFactory = () => BrainStore.create() } = 
       return;
     }
 
+    if (missingRequiredRedisOnVercel() && message.method === "tools/call") {
+      sendJson(response, 200, jsonRpcError(message.id, -32000, missingRedisMessage()));
+      return;
+    }
     const store = await storeFactory();
     const rpcResponse = await dispatch(store, message, request);
     const headers = {};
