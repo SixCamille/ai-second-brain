@@ -1,10 +1,10 @@
-# Second Brain MCP
+# AI Second Brain
 
-Web MCP connector for a JSON-based second brain, deployable on Vercel.
+Web MCP connector for AI Second Brain, deployable on Vercel.
 
-## What Is BRAIN?
+## What Is AI Second Brain?
 
-BRAIN is a small remote memory server for AI agents. It stores durable user or project context as JSON objects connected by untyped relations, then exposes that memory through MCP tools.
+AI Second Brain is a small remote memory server for AI agents. It stores durable user or project context as JSON objects connected by untyped relations, then exposes that memory through MCP tools.
 
 It is designed to stay simple:
 
@@ -54,7 +54,7 @@ KV_REST_API_TOKEN=...
 ```
 
 5. Deploy.
-6. Open the view URL. If no password is configured yet, BRAIN shows the initialization screen.
+6. Open the view URL. If no password is configured yet, AI Second Brain shows the initialization screen.
 7. Generate and copy:
 
 ```text
@@ -127,14 +127,14 @@ The connector exposes these tools:
 - `delete_object_cascade`
 - `archive_object`
 
-`get_rules` reads the structural entry point `rules/README.md` and the customizable `rules/user_instructions.md` file. User instructions are user-specific complements and take priority when they specify or override the expected behavior defined by BRAIN's global rules.
+`get_rules` reads the structural entry point `rules/README.md` and the customizable `rules/user_instructions.md` file. User instructions are user-specific complements and take priority when they specify or override the expected behavior defined by AI Second Brain's global rules.
 
 `get_rule` reads one focused rule file by name: `editing_rules.md`, `kind.md`, `relations.md`, or `memory_policy.md`.
 
 The structural Markdown files in `rules/`, except `user_instructions.md`, are tracked repository assets and are bundled with the deployment. They carry the strategic framework and are not user-configurable runtime storage. Technical tool usage details, including when to call a tool, which precautions to take, and which fields to provide, are exposed directly through the MCP descriptions and schemas returned by `tools/list`.
 
 `get_user_instructions` reads only `rules/user_instructions.md`.
-`set_user_instructions` replaces the entire Markdown file, without targeted editing, with a limit of 32768 UTF-8 bytes. This file stores personal preferences without changing BRAIN's structural rules.
+`set_user_instructions` replaces the entire Markdown file, without targeted editing, with a limit of 32768 UTF-8 bytes. This file stores personal preferences without changing AI Second Brain's structural rules.
 
 `list_kinds` reads kind names from `rules/kinds.json`.
 `list_kind_configs` reads kinds with their full visual configuration, including the `{ fill, stroke }` color used for graph nodes and tags.
@@ -172,7 +172,7 @@ Objects can include `priority`, a number between `0` and `1`, defaulting to `0.5
 
 `list_due_tasks` lists active, unfinished objects with kind `task`, sorted by `dates.deadline_at`, priority, and freshness. It accepts `due_before` to filter tasks due on or before an ISO date or datetime, `include_no_deadline: true` to include tasks without a deadline, and `limit`. When `due_before` is a date only (`YYYY-MM-DD`), the whole day is included.
 
-`get_view_link` returns the BRAIN view URL configured by `BRAIN_VIEW_URL` or `config.view_url`. With `{ "id": "obj_xxx" }`, it adds a direct node link through `#node=obj_xxx`.
+`get_view_link` returns the AI Second Brain view URL configured by `BRAIN_VIEW_URL` or `config.view_url`. With `{ "id": "obj_xxx" }`, it adds a direct node link through `#node=obj_xxx`.
 
 Objects can store a deadline in `dates.deadline_at`. This value accepts a date only (`YYYY-MM-DD`) or an ISO datetime for a precise deadline. This date complements `priority`: priority indicates importance, while the deadline indicates temporal urgency. Completed objects can store `dates.completed_at`. Archiving a node automatically adds `dates.completed_at` if it does not already exist.
 
@@ -216,7 +216,7 @@ UPSTASH_REDIS_REST_TOKEN
 
 ## Web Setup
 
-The view is protected by default. Without a configured password, it shows an initialization assistant instead of rendering the brain. This screen lets the user choose a password and generates these values in the browser:
+The view is protected by default. Without a configured password, it shows an initialization assistant instead of rendering the graph. This screen lets the user choose a password and generates these values in the browser:
 
 - `BRAIN_VIEW_URL`
 - `BRAIN_MCP_SECRET`

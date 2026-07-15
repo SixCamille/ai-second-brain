@@ -33,7 +33,7 @@ test("createObject writes object and automatic event", async () => {
   const result = await createTestObject(store, {
     object: {
       kind: "project",
-      title: "Second Brain MCP",
+      title: "AI Second Brain",
       summary: "External memory represented as a graph.",
       content: ["Explicit relations."]
     },
@@ -41,7 +41,7 @@ test("createObject writes object and automatic event", async () => {
   });
 
   const object = result.object;
-  assert.equal(object.id, "obj_second_cerveau_mcp");
+  assert.equal(object.id, "obj_ai_second_brain");
   assert.equal((await store.adapter.listObjects()).length, 1);
   const events = await store.readObjectEvents({ id: object.id });
   assert.equal(events.id, object.id);
@@ -780,7 +780,7 @@ test("search is accent-insensitive and includes content", async () => {
   await adapter.putObject({
     id: "obj_rules_brain",
     kind: "task",
-    title: "BRAIN Rules",
+    title: "AI Second Brain Rules",
     summary: "Technical task.",
     content: ["Strengthen logical links after creation."],
     relations: [],
@@ -891,12 +891,12 @@ test("listKinds parses registered kinds from rules", async () => {
 test("getRules includes user instructions after structural rules", async () => {
   const adapter = new MemoryAdapter();
   const store = new BrainStore(adapter, undefined, {
-    structuralRules: { "README.md": "Global BRAIN rules." }
+    structuralRules: { "README.md": "Global AI Second Brain rules." }
   });
   await store.setUserInstructions({ content: "Prefer concise answers." });
 
   assert.deepEqual(await store.getRules(), {
-    "README.md": "Global BRAIN rules.",
+    "README.md": "Global AI Second Brain rules.",
     "user_instructions.md": "Prefer concise answers."
   });
 });

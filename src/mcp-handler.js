@@ -9,8 +9,8 @@ const SESSION_TTL_MS = 15 * 60 * 1000;
 const MAX_SESSIONS_PER_CLIENT = 12;
 const ACTOR_DESCRIPTION = "Optional actor label for audit events. Use the agent product/family name, for example Codex, ChatGPT, Claude, Claude Code, Cursor, Gemini, Grok, Perplexity, Mistral or GLM; do not use the human user's name.";
 const MEMORY_INSTRUCTIONS = [
-  "BRAIN stores durable user-specific memory as JSON objects connected by untyped weighted relations.",
-  "Use get_rules for the strategic entry point and user-specific instructions; user_instructions.md has priority when it specifies or overrides expected behavior.",
+  "AI Second Brain stores durable user-specific memory as JSON objects connected by untyped weighted relations.",
+  "Call get_rules before any memory mutation; use it for the strategic entry point and user-specific instructions. user_instructions.md has priority when it specifies or overrides expected behavior.",
   "Use get_rule for focused guidance when it is relevant: editing_rules.md for object/content decisions, kind.md for kind selection, relations.md for graph links, and memory_policy.md for what deserves memory.",
   "Technical operation details live in the MCP tool descriptions and schemas.",
   "Mutating tools expect rules_acknowledged: true once the applicable guidance has been considered.",
@@ -59,7 +59,7 @@ const DESCRIPTIONS = {
     "Set include_no_deadline when planning should include tasks without a deadline."
   ].join(" "),
   getViewLink: [
-    "Return the configured BRAIN web view URL, optionally deep-linked to #node=<id>.",
+    "Return the configured AI Second Brain web view URL, optionally deep-linked to #node=<id>.",
     "Use when the user wants to open or inspect the memory graph visually.",
     "The base URL comes from BRAIN_VIEW_URL or config.view_url."
   ].join(" "),
@@ -71,7 +71,7 @@ const DESCRIPTIONS = {
   getRules: [
     "Return only the strategic rules entry point README.md plus user_instructions.md.",
     "This tool intentionally does not return editing_rules.md, kind.md, relations.md, or memory_policy.md.",
-    "User instructions are editable, user-specific complements and have priority when they specify or override BRAIN behavior.",
+    "User instructions are editable, user-specific complements and have priority when they specify or override AI Second Brain behavior.",
     "Before any mutation, use get_rule for each detailed strategic rule that applies to the current decision.",
     "Do not expect this tool to return every rules/*.md file; technical tool usage is described by MCP schemas and descriptions."
   ].join(" "),
@@ -82,11 +82,11 @@ const DESCRIPTIONS = {
   ].join(" "),
   getUserInstructions: [
     "Read the user-specific Markdown instructions file.",
-    "These instructions complement BRAIN's structural rules and have priority when they specify or override expected behavior."
+    "These instructions complement AI Second Brain's structural rules and have priority when they specify or override expected behavior."
   ].join(" "),
   setUserInstructions: [
     "Replace the whole user-specific Markdown instructions file.",
-    "Use this for personal preferences or rules without changing BRAIN's immutable structural rules.",
+    "Use this for personal preferences or rules without changing AI Second Brain's immutable structural rules.",
     "The content is limited to 32768 UTF-8 bytes."
   ].join(" "),
   listKinds: [
@@ -605,7 +605,7 @@ export async function dispatch(store, message, request = { headers: {} }) {
         return jsonRpcResult(message.id, {
           protocolVersion: PROTOCOL_VERSION,
           capabilities: { tools: {} },
-          serverInfo: { name: "second-brain-mcp", version: "0.1.0" },
+          serverInfo: { name: "AI Second Brain", version: "0.1.0" },
           instructions: MEMORY_INSTRUCTIONS
         });
       case "tools/list":
@@ -723,7 +723,7 @@ async function callTool(store, params) {
 
 function assertRulesAcknowledged(args) {
   if (args.rules_acknowledged !== true) {
-    throw new McpError("Mutating memory requires rules_acknowledged: true after considering the applicable BRAIN guidance.", -32602);
+    throw new McpError("Call get_rules before mutating memory. Mutating memory requires rules_acknowledged: true after considering the applicable AI Second Brain guidance.", -32602);
   }
 }
 
@@ -789,7 +789,7 @@ function sendSseAccepted(response, onClose) {
     connection: "keep-alive"
   });
   response.on?.("close", onClose);
-  response.write(": second-brain-mcp ready\n\n");
+  response.write(": ai-second-brain-mcp ready\n\n");
   response.end();
 }
 
@@ -931,7 +931,7 @@ function objectIdSchema(description = "Object id.") {
 function rulesAcknowledgedSchema() {
   return {
     type: "boolean",
-    description: "Set true when the applicable BRAIN guidance has been considered."
+    description: "Set true when the applicable AI Second Brain guidance has been considered."
   };
 }
 

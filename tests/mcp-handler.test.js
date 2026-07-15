@@ -314,15 +314,15 @@ test("create_object includes direct view link when configured", async () => {
       params: {
         name: "create_object",
         arguments: {
-          title: "BRAIN Project",
+          title: "AI Second Brain Project",
           rules_acknowledged: true
         }
       }
     });
 
     const result = JSON.parse(response.result.content[0].text);
-    assert.equal(result.id, "obj_brain_project");
-    assert.equal(result.view_link.url, "https://brain.example.com#node=obj_brain_project");
+    assert.equal(result.id, "obj_ai_second_brain_project");
+    assert.equal(result.view_link.url, "https://brain.example.com#node=obj_ai_second_brain_project");
   } finally {
     if (previousViewUrl === undefined) {
       delete process.env.BRAIN_VIEW_URL;

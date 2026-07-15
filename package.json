@@ -1,7 +1,7 @@
 {
-  "name": "second-brain-mcp",
+  "name": "ai-second-brain-mcp",
   "version": "0.1.0",
-  "description": "Web MCP connector for a JSON-based second brain, deployable on Vercel.",
+  "description": "Web MCP connector for AI Second Brain, deployable on Vercel.",
   "type": "module",
   "scripts": {
     "dev": "node server.local.js",

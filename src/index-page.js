@@ -9,7 +9,7 @@ export async function renderIndexPage(store) {
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Second Brain MCP</title>
+    <title>AI Second Brain</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="stylesheet" href="${assetPath("/assets/styles.css")}">
   </head>
@@ -17,7 +17,7 @@ export async function renderIndexPage(store) {
     <main>
       <div class="intro">
         <div class="intro-text">
-          <h1>Second Brain MCP</h1>
+          <h1>AI Second Brain</h1>
           <p>Structured JSON memory organized as objects and relations. Click a node to read its details and connections.</p>
         </div><!--
         --><div class="metrics" aria-label="Statistics">

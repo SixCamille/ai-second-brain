@@ -19,7 +19,7 @@ const server = http.createServer(async (request, response) => {
   if (url.pathname === "/health") {
     sendJson(response, 200, {
       ok: true,
-      name: "second-brain-mcp",
+      name: "ai-second-brain-mcp",
       transport: "streamable-http"
     });
     return;
@@ -45,7 +45,7 @@ const server = http.createServer(async (request, response) => {
 });
 
 server.listen(port, () => {
-  console.error(`Second Brain MCP listening on http://localhost:${port}/mcp`);
+  console.error(`AI Second Brain MCP listening on http://localhost:${port}/mcp`);
 });
 
 function sendJson(response, status, payload) {

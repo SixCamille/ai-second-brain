@@ -1,4 +1,4 @@
-# Second Brain Rules
+# AI Second Brain Rules
 
 These files describe the principles used to build, organize, and evolve the memory graph.
 

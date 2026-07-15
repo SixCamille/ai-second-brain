@@ -181,7 +181,7 @@ function renderLoginPage({ invalid }) {
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Second Brain</title>
+    <title>AI Second Brain</title>
     <style>
       :root {
         color-scheme: light dark;
@@ -251,7 +251,7 @@ function renderLoginPage({ invalid }) {
   </head>
   <body>
     <main>
-      <h1>Second Brain</h1>
+      <h1>AI Second Brain</h1>
       ${invalid ? '<p class="error">Incorrect password.</p>' : ""}
       <form method="post">
         <label for="password">Password</label>
@@ -273,7 +273,7 @@ function renderSetupRequiredPage() {
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Second Brain</title>
+    <title>AI Second Brain</title>
     <style>
       :root {
         color-scheme: light dark;
@@ -387,7 +387,7 @@ function renderSetupRequiredPage() {
   </head>
   <body>
     <main>
-      <h1>Initialize BRAIN</h1>
+      <h1>Initialize AI Second Brain</h1>
       <p class="hint">The view is protected by default. Choose a password, then copy the generated variables into the Vercel environment.</p>
       <label for="view-url">View URL</label>
       <input id="view-url" type="url" value="${setupDefaultViewUrl()}">

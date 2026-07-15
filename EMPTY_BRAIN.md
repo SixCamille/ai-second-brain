@@ -1,6 +1,6 @@
-# Starting With An Empty Brain
+# Starting With An Empty AI Second Brain
 
-Use this guide when creating a fresh BRAIN instance with no existing `objects/` or cloud KV data.
+Use this guide when creating a fresh AI Second Brain instance with no existing `objects/` or cloud KV data.
 
 ## Files To Copy Into A Fresh Repository
 
@@ -58,7 +58,7 @@ BRAIN_VIEW_PASSWORD_HASH=...
 
 7. Add those variables to Vercel, then redeploy.
 
-When either Redis REST pair is present, BRAIN automatically uses Redis/KV for objects, events, user instructions, and mutable kind configuration. Without those variables, local development falls back to repository folders for runtime memory.
+When either Redis REST pair is present, AI Second Brain automatically uses Redis/KV for objects, events, user instructions, and mutable kind configuration. Without those variables, local development falls back to repository folders for runtime memory.
 
 ## What A Fresh Instance Contains
 
