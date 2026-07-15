@@ -65,7 +65,7 @@ BRAIN_VIEW_PASSWORD_HASH=...
 
 8. Add these variables to Vercel, redeploy, then sign in.
 
-For a complete blank-instance checklist, see [Starting With An Empty Brain](EMPTY_BRAIN.md).
+For a browser-based setup walkthrough, see [Mise En Place Client](SETUP.md). For a complete blank-instance checklist, see [Starting With An Empty Brain](EMPTY_BRAIN.md).
 
 ## MCP Usage
 
