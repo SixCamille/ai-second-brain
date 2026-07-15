@@ -129,7 +129,7 @@ The connector exposes these tools:
 
 `get_rules` reads the structural entry point `rules/README.md` and the customizable `rules/user_instructions.md` file. User instructions are user-specific complements and take priority when they specify or override the expected behavior defined by AI Second Brain's global rules.
 
-`get_rule` reads one focused rule file by name: `editing_rules.md`, `kind.md`, `relations.md`, or `memory_policy.md`.
+`get_rule` reads one focused rule file by name: `editing_rules.md`, `empty_brain.md`, `kind.md`, `relations.md`, or `memory_policy.md`.
 
 The structural Markdown files in `rules/`, except `user_instructions.md`, are tracked repository assets and are bundled with the deployment. They carry the strategic framework and are not user-configurable runtime storage. Technical tool usage details, including when to call a tool, which precautions to take, and which fields to provide, are exposed directly through the MCP descriptions and schemas returned by `tools/list`.
 

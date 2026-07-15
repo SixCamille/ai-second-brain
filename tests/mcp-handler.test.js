@@ -90,6 +90,7 @@ test("rules tools separate strategic files from technical tool descriptions", as
   assert.deepEqual(ruleTool.inputSchema.properties.name.enum, [
     "README.md",
     "editing_rules.md",
+    "empty_brain.md",
     "kind.md",
     "relations.md",
     "memory_policy.md"
@@ -210,6 +211,20 @@ test("get_rule returns one specific rule file", async () => {
   const rule = JSON.parse(response.result.content[0].text);
   assert.deepEqual(Object.keys(rule), ["memory_policy.md"]);
   assert.match(rule["memory_policy.md"], /Store durable user-specific context/);
+});
+
+test("get_rule returns empty brain onboarding guidance", async () => {
+  const response = await dispatch(new BrainStore(new MemoryAdapter()), {
+    jsonrpc: "2.0",
+    id: 21,
+    method: "tools/call",
+    params: { name: "get_rule", arguments: { name: "empty_brain.md" } }
+  });
+
+  const rule = JSON.parse(response.result.content[0].text);
+  assert.deepEqual(Object.keys(rule), ["empty_brain.md"]);
+  assert.match(rule["empty_brain.md"], /active projects/);
+  assert.match(rule["empty_brain.md"], /Do not create generic starter nodes/);
 });
 
 test("export_nodes_summary tool returns compact nodes without content", async () => {

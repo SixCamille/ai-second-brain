@@ -12,7 +12,7 @@ const ACTOR_DESCRIPTION = "Optional actor label for audit events. Use the agent 
 const MEMORY_INSTRUCTIONS = [
   "AI Second Brain stores durable user-specific memory as JSON objects connected by untyped weighted relations.",
   "Call get_rules before any memory mutation; use it for the strategic entry point and user-specific instructions. user_instructions.md has priority when it specifies or overrides expected behavior.",
-  "Use get_rule for focused guidance when it is relevant: editing_rules.md for object/content decisions, kind.md for kind selection, relations.md for graph links, and memory_policy.md for what deserves memory.",
+  "Use get_rule for focused guidance when it is relevant: editing_rules.md for object/content decisions, empty_brain.md for bootstrapping a blank graph, kind.md for kind selection, relations.md for graph links, and memory_policy.md for what deserves memory.",
   "Technical operation details live in the MCP tool descriptions and schemas.",
   "Mutating tools expect rules_acknowledged: true once the applicable guidance has been considered.",
   "Search before creating; read before replacing or removing content; prefer precise field/content/relation tools over broad updates.",
@@ -25,7 +25,7 @@ const MEMORY_INSTRUCTIONS = [
   "Do not store public facts as standalone objects; keep them only as justification for a personal project, decision, constraint or reasoning."
 ].join(" ");
 
-const RULE_NAMES = ["README.md", "editing_rules.md", "kind.md", "relations.md", "memory_policy.md"];
+const RULE_NAMES = ["README.md", "editing_rules.md", "empty_brain.md", "kind.md", "relations.md", "memory_policy.md"];
 
 const DESCRIPTIONS = {
   search: [
@@ -71,14 +71,14 @@ const DESCRIPTIONS = {
   ].join(" "),
   getRules: [
     "Return only the strategic rules entry point README.md plus user_instructions.md.",
-    "This tool intentionally does not return editing_rules.md, kind.md, relations.md, or memory_policy.md.",
+    "This tool intentionally does not return editing_rules.md, empty_brain.md, kind.md, relations.md, or memory_policy.md.",
     "User instructions are editable, user-specific complements and have priority when they specify or override AI Second Brain behavior.",
     "Before any mutation, use get_rule for each detailed strategic rule that applies to the current decision.",
     "Do not expect this tool to return every rules/*.md file; technical tool usage is described by MCP schemas and descriptions."
   ].join(" "),
   getRule: [
     "Return one allowed strategic rule file by exact name.",
-    "Use editing_rules.md for creation/update/consolidation strategy, kind.md for choosing or creating kinds, relations.md for graph link policy, and memory_policy.md for deciding what deserves memory.",
+    "Use editing_rules.md for creation/update/consolidation strategy, empty_brain.md for bootstrapping a blank graph, kind.md for choosing or creating kinds, relations.md for graph link policy, and memory_policy.md for deciding what deserves memory.",
     "This is targeted lookup, not a bulk rules loader."
   ].join(" "),
   getUserInstructions: [

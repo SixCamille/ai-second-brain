@@ -20,6 +20,7 @@ const MAX_USER_INSTRUCTIONS_BYTES = 32 * 1024;
 const RULE_FILES = new Set([
   RULES_ENTRYPOINT,
   "editing_rules.md",
+  "empty_brain.md",
   "kind.md",
   "relations.md",
   "memory_policy.md"
@@ -166,6 +167,15 @@ const DEFAULT_EDITING_RULES = [
 const DEFAULT_RULES = {
   [RULES_ENTRYPOINT]: "Read this rules entry point before memory mutations. Detailed tool schemas are exposed by the MCP tools. Use list_kinds and list_kind_configs for the kind registry.",
   "editing_rules.md": DEFAULT_EDITING_RULES,
+  "empty_brain.md": [
+    "# Empty Brain Onboarding",
+    "",
+    "When the memory graph is empty or nearly empty, ask the user for active projects, near-term tasks, important people or organizations, durable preferences or constraints, and useful resources or routines.",
+    "",
+    "Create only grounded nodes supported by the user's answers. Search first, link related starter nodes in the same pass, store real deadlines in deadline_at, and avoid generic invented starter nodes.",
+    "",
+    "Do not create generic starter nodes such as User, Work, or Personal unless the user gives them concrete meaning."
+  ].join("\n"),
   "kinds.json": defaultKindsConfigText(),
   "kind.md": defaultKindsRule(),
   "relations.md": "Relations are untyped links. Store only { to, importance }. A pair of nodes can have at most one relation, regardless of direction. importance defaults to 0.5 and must be > 0 and <= 1.",

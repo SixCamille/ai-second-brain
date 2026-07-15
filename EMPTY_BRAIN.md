@@ -70,6 +70,7 @@ A new instance can start with only:
 
 - `rules/README.md`
 - `rules/editing_rules.md`
+- `rules/empty_brain.md`
 - `rules/kind.md`
 - `rules/relations.md`
 - `rules/memory_policy.md`
