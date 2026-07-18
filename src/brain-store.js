@@ -508,7 +508,7 @@ export class BrainStore {
   }
 
   async listKinds() {
-    return (await this.listKindConfigs()).map((item) => item.kind);
+    return [...new Set((await this.listKindConfigs()).map((item) => item.kind))];
   }
 
   async listKindConfigs() {

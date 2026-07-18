@@ -266,7 +266,7 @@ test("list_due_tasks tool returns tasks ordered for action", async () => {
 
   const dueTasks = JSON.parse(response.result.content[0].text);
   assert.equal(dueTasks.task_count, 1);
-  assert.equal(dueTasks.tasks[0].id, "obj_task_urgent");
+  assert.equal(dueTasks.tasks[0].id, "obj_urgent_task");
   assert.equal(dueTasks.tasks[0].deadline_at, "2026-07-10T00:00:00.000Z");
   assert.equal(dueTasks.tasks[0].priority, 1);
 });
@@ -469,7 +469,7 @@ test("archive_object tool marks objects archived after acknowledgement", async (
   assert.equal(archived.archived, true);
   assert.match(archived.archived_at, /^\d{4}-\d{2}-\d{2}T/);
   assert.equal((await store.search({ query: "temporaire" })).length, 0);
-  assert.equal((await store.search({ query: "temporaire", include_archived: true })).length, 1);
+  assert.equal((await store.search({ query: "temporary", include_archived: true })).length, 1);
 });
 
 class MemoryAdapter {
