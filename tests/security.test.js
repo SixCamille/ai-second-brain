@@ -14,6 +14,18 @@ test("BRAIN_ALLOW_UNPROTECTED_VIEW bypasses configured view password", () => {
   );
 });
 
+test("BRAIN_ALLOW_UNPROTECTED_VIEW accepts Vercel numeric truthy value", () => {
+  withViewSecurityEnv(
+    {
+      BRAIN_ALLOW_UNPROTECTED_VIEW: "1",
+      BRAIN_VIEW_PASSWORD_HASH: "sha256:salt:hash"
+    },
+    () => {
+      assert.equal(isViewAuthorized(createRequest()), true);
+    }
+  );
+});
+
 test("configured view password still protects the view by default", () => {
   withViewSecurityEnv(
     {

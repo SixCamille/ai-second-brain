@@ -20,7 +20,7 @@ export function hasViewPassword() {
 }
 
 export function requiresViewPassword() {
-  return process.env.BRAIN_ALLOW_UNPROTECTED_VIEW !== "true";
+  return !truthyEnv(process.env.BRAIN_ALLOW_UNPROTECTED_VIEW);
 }
 
 export function isViewAuthorized(request) {
@@ -99,6 +99,10 @@ function viewPassword() {
 
 function viewPasswordHash() {
   return process.env.BRAIN_VIEW_PASSWORD_HASH || process.env.VIEW_PASSWORD_HASH || "";
+}
+
+function truthyEnv(value) {
+  return ["1", "true"].includes(String(value || "").trim().toLowerCase());
 }
 
 function verifyViewPassword(password) {
