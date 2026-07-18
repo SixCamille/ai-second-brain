@@ -24,7 +24,8 @@ export function requiresViewPassword() {
 }
 
 export function isViewAuthorized(request) {
-  if (!hasViewPassword()) return !requiresViewPassword();
+  if (!requiresViewPassword()) return true;
+  if (!hasViewPassword()) return false;
   const cookies = parseCookies(request.headers.cookie || "");
   return safeEqual(cookies[VIEW_COOKIE], signViewCookie());
 }
