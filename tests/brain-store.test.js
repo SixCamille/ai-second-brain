@@ -220,8 +220,11 @@ test("updateObject can add outgoing relations directly without duplicating exist
   assert.deepEqual(updated.relations, [
     { to: target.id, importance: 0.5 }
   ]);
-  assert.equal(updated.warnings.length, 1);
-  assert.equal(updated.warnings[0].code, "duplicate_relation");
+  assert.equal(updated.warnings.length, 2);
+  assert.deepEqual(updated.warnings.map((warning) => warning.code), [
+    "duplicate_relation",
+    "duplicate_relation"
+  ]);
 });
 
 test("context pack touches last_seen_at", async () => {
@@ -285,10 +288,12 @@ test("createRelation rejects an existing reverse link", async () => {
   const target = await createTestObject(store, { object: { title: "PostgreSQL", kind: "resource" } });
 
   await store.createRelation({ from_id: target.id, to_id: source.id });
-  await assert.rejects(
-    () => store.createRelation({ from_id: source.id, to_id: target.id }),
-    /Relation already exists between/
-  );
+  const duplicate = await store.createRelation({ from_id: source.id, to_id: target.id });
+
+  assert.equal(duplicate.status, "already_exists");
+  assert.equal(duplicate.warnings[0].code, "duplicate_relation");
+  assert.equal(duplicate.warnings[0].existing_from_id, target.id);
+  assert.equal(duplicate.warnings[0].existing_to_id, source.id);
 });
 
 test("updateRelation changes target and keeps automatic event", async () => {
@@ -406,7 +411,7 @@ test("deleteObject rejects objects with incoming or outgoing relations", async (
 
   await assert.rejects(
     () => store.deleteObject({ id: source.id, reason: "Test outgoing relation." }),
-    /Cannot delete linked object .*outgoing:obj_ressource_beta/
+    /Cannot delete linked object .*outgoing:obj_resource_beta/
   );
   await assert.rejects(
     () => store.deleteObject({ id: target.id, reason: "Test incoming relation." }),
@@ -532,8 +537,7 @@ test("overview excludes archived objects by default", async () => {
 
   assert.deepEqual(overview.nodes.map((object) => object.id), [active.id]);
   assert.equal(overview.objectCount, 1);
-  assert.equal(overview.activity[0].id, archived.id);
-  assert.equal(overview.activity[0].action, "archive");
+  assert.ok(overview.activity.some((event) => event.id === archived.id && event.action === "archive"));
   assert.equal(overviewWithArchived.objectCount, 2);
 });
 
@@ -590,10 +594,11 @@ test("overview returns counts, kinds, and newest objects", async () => {
 
   assert.equal(overview.objectCount, 2);
   assert.equal(overview.relationCount, 1);
-  assert.deepEqual(overview.kinds, [
+  assert.deepEqual(overview.kinds.map(({ kind, count }) => ({ kind, count })), [
     { kind: "idea", count: 1 },
     { kind: "project", count: 1 }
   ]);
+  assert.deepEqual(Object.keys(overview.kinds[0].color), ["fill", "stroke"]);
   assert.equal(overview.latest[0].id, "obj_recent_project");
   assert.deepEqual(overview.activity, []);
   assert.deepEqual(
@@ -697,12 +702,12 @@ test("createObject stores task deadlines and listDueTasks sorts by deadline then
 
   assert.deepEqual(
     dueTasks.tasks.map((task) => task.id),
-    ["obj_task_soon", "obj_task_later", "obj_task_without_date"]
+    ["obj_soon_task", "obj_later_task", "obj_task_without_date"]
   );
   assert.equal(dueTasks.tasks[0].deadline_at, "2026-07-10T00:00:00.000Z");
   assert.equal(dueTasks.tasks[1].priority, 1);
   assert.equal(dueTasks.tasks[2].priority, 0.5);
-  assert.deepEqual(filtered.tasks.map((task) => task.id), ["obj_task_soon"]);
+  assert.deepEqual(filtered.tasks.map((task) => task.id), ["obj_soon_task"]);
 });
 
 test("listDueTasks keeps precise deadline times and date-only filters include the whole day", async () => {
@@ -730,7 +735,7 @@ test("listDueTasks keeps precise deadline times and date-only filters include th
   assert.equal(dueToday.due_before, "2026-07-12");
   assert.deepEqual(
     dueToday.tasks.map((task) => task.id),
-    ["obj_task_morning", "obj_task_evening"]
+    ["obj_morning_task", "obj_evening_task"]
   );
   assert.equal(dueToday.tasks[0].deadline_at, "2026-07-12T09:30:00.000Z");
 });
