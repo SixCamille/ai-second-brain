@@ -3,6 +3,7 @@
   var kindConfigs = JSON.parse(document.getElementById("kind-data").textContent);
   var launchInfo = JSON.parse(document.getElementById("launch-data").textContent);
   var kindConfigByName = new Map(kindConfigs.map(function (item) { return [item.kind, item]; }));
+  var searchIndex = buildSearchIndex(nodes);
   var nodeById = new Map(nodes.map(function (node) { return [node.id, node]; }));
   var degreeById = buildDegreeMap(nodes);
   var clusterModel = buildClusterModel(nodes, degreeById);
@@ -162,7 +163,7 @@
 
   search.addEventListener("input", function (event) {
     query = normalizeSearchText(event.target.value.trim());
-    render();
+    renderSearchResults();
   });
 
   graph.addEventListener("click", function (event) {
@@ -233,28 +234,28 @@
   }
 
   function searchRank(node) {
-    var title = normalizeSearchText(node.title);
-    if (title === query) return 0;
-    if (title.includes(query)) return 1;
+    var indexed = searchIndex.get(node.id) || {};
+    if (indexed.title === query) return 0;
+    if (indexed.title && indexed.title.includes(query)) return 1;
 
-    var contentText = normalizeSearchText([
-      node.summary,
-      (node.content || []).join(" ")
-    ].join(" "));
-    if (contentText.includes(query)) return 2;
+    if (indexed.content && indexed.content.includes(query)) return 2;
 
     return Infinity;
   }
 
-  function render() {
+  function renderSearchResults() {
     var matches = filteredNodes();
+    renderList(query ? matches : nodes);
+  }
+
+  function render() {
     var visible = nodes;
     if (selectedId && !nodeById.has(selectedId)) {
       selectedId = "";
       graphFocusActive = false;
       clearNodeHash();
     }
-    renderList(query ? matches : visible);
+    renderSearchResults();
     renderGraph(visible);
     renderGraphFocus();
     renderDetail();
@@ -1620,6 +1621,18 @@
     var text = String(value || "");
     var limit = maxLength || 18;
     return text.length > limit ? text.slice(0, Math.max(1, limit - 2)) + ".." : text;
+  }
+
+  function buildSearchIndex(list) {
+    return new Map(list.map(function (node) {
+      return [node.id, {
+        title: normalizeSearchText(node.title),
+        content: normalizeSearchText([
+          node.summary,
+          (node.content || []).join(" ")
+        ].join(" "))
+      }];
+    }));
   }
 
   function normalizeSearchText(value) {

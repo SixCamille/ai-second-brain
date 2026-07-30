@@ -1158,11 +1158,11 @@ class FileAdapter {
 
   async listObjects() {
     const entries = await fs.readdir(this.objectsDir).catch(() => []);
-    const objects = [];
-    for (const entry of entries.filter((name) => /^obj_[a-z0-9_]+\.json$/.test(name))) {
-      objects.push(JSON.parse(await fs.readFile(path.join(this.objectsDir, entry), "utf8")));
-    }
-    return objects;
+    const files = entries.filter((name) => /^obj_[a-z0-9_]+\.json$/.test(name));
+    const values = await Promise.all(
+      files.map((entry) => fs.readFile(path.join(this.objectsDir, entry), "utf8"))
+    );
+    return values.map((value) => JSON.parse(value));
   }
 
   async getObject(id) {
@@ -1212,10 +1212,15 @@ class FileAdapter {
 
   async listAllObjectEvents() {
     const entries = await fs.readdir(this.eventsDir).catch(() => []);
+    const files = entries.filter((name) => /^obj_[a-z0-9_]+\.events\.jsonl$/.test(name));
+    const values = await Promise.all(
+      files.map(async (entry) => ({
+        id: entry.replace(/\.events\.jsonl$/, ""),
+        text: await fs.readFile(path.join(this.eventsDir, entry), "utf8")
+      }))
+    );
     const events = [];
-    for (const entry of entries.filter((name) => /^obj_[a-z0-9_]+\.events\.jsonl$/.test(name))) {
-      const id = entry.replace(/\.events\.jsonl$/, "");
-      const text = await fs.readFile(path.join(this.eventsDir, entry), "utf8");
+    for (const { id, text } of values) {
       for (const line of text.split(/\r?\n/).filter(Boolean)) {
         events.push({ id, ...JSON.parse(line) });
       }
@@ -1284,12 +1289,8 @@ class KvAdapter {
 
   async listObjects() {
     const keys = await this.command(["KEYS", "brain:object:*"]);
-    const objects = [];
-    for (const key of keys) {
-      const value = await this.command(["GET", key]);
-      if (value) objects.push(JSON.parse(value));
-    }
-    return objects;
+    const values = await Promise.all(keys.map((key) => this.command(["GET", key])));
+    return values.filter(Boolean).map((value) => JSON.parse(value));
   }
 
   async getObject(id) {
@@ -1317,10 +1318,14 @@ class KvAdapter {
 
   async listAllObjectEvents() {
     const keys = await this.command(["KEYS", "brain:event:*"]);
+    const values = await Promise.all(
+      keys.map(async (key) => ({
+        id: key.replace("brain:event:", ""),
+        items: await this.command(["LRANGE", key, "0", "-1"])
+      }))
+    );
     const events = [];
-    for (const key of keys) {
-      const id = key.replace("brain:event:", "");
-      const items = await this.command(["LRANGE", key, "0", "-1"]);
+    for (const { id, items } of values) {
       for (const item of items) {
         events.push({ id, ...JSON.parse(item) });
       }
@@ -1455,9 +1460,10 @@ function newObject(id, input, timestamp) {
 
 function searchCandidates(objects, { terms, kind, matchAllTerms = false, objects: allObjects = objects }) {
   const objectById = new Map(allObjects.map((object) => [object.id, object]));
+  const searchIndex = buildSearchIndex(allObjects, objectById);
   return objects
     .filter((object) => !kind || object.kind === kind)
-    .map((object) => ({ object, score: searchScore(terms, object, objectById, { matchAllTerms }) }))
+    .map((object) => ({ object, score: searchScore(terms, object, searchIndex, { matchAllTerms }) }))
     .filter((candidate) => candidate.score > 0 || terms.size === 0)
     .sort(
       (a, b) =>
@@ -1473,9 +1479,9 @@ function filterArchived(objects, includeArchived = false) {
   return includeArchived ? objects : objects.filter((object) => !object.dates?.archived_at);
 }
 
-function searchScore(terms, object, objectById, { matchAllTerms = false } = {}) {
+function searchScore(terms, object, searchIndex, { matchAllTerms = false } = {}) {
   if (terms.size === 0) return true;
-  const buckets = searchableBuckets(object, objectById);
+  const buckets = searchIndex.get(object.id) || emptySearchBuckets();
   const matched = [];
   for (const term of terms) {
     const score = scoreTerm(term, buckets);
@@ -1494,6 +1500,14 @@ function scoreTerm(term, buckets) {
   if (buckets.content.has(term)) return 3;
   if (buckets.all.some((word) => word.includes(term))) return 1;
   return 0;
+}
+
+function buildSearchIndex(objects, objectById = new Map(objects.map((object) => [object.id, object]))) {
+  const index = new Map();
+  for (const object of objects) {
+    index.set(object.id, searchableBuckets(object, objectById));
+  }
+  return index;
 }
 
 function searchableBuckets(object, objectById) {
@@ -1526,6 +1540,18 @@ function searchableBuckets(object, objectById) {
       ...buckets.content,
       ...buckets.relations
     ]
+  };
+}
+
+function emptySearchBuckets() {
+  return {
+    id: new Set(),
+    kind: new Set(),
+    title: new Set(),
+    summary: new Set(),
+    content: new Set(),
+    relations: new Set(),
+    all: []
   };
 }
 
