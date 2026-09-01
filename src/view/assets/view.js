@@ -6,10 +6,17 @@
   var searchIndex = buildSearchIndex(nodes);
   var nodeById = new Map(nodes.map(function (node) { return [node.id, node]; }));
   var degreeById = buildDegreeMap(nodes);
-  var clusterModel = buildClusterModel(nodes, degreeById);
+  var maxDegree = maxDegreeValue(degreeById);
+  var graphEdgesList = graphEdges(nodes);
+  var neighborIdsById = buildNeighborIdsById(nodes, graphEdgesList);
+  var edgesByNodeId = buildEdgesByNodeId(nodes, graphEdgesList);
+  var clusterModel = buildClusterModel(nodes, degreeById, graphEdgesList);
   var clusterNodeGroups = nodesByCluster(nodes, clusterModel);
   var clusterRadii = clusterLayoutRadii(clusterModel.clusters, clusterNodeGroups, clusterModel.adjacency);
   var layoutById = buildGalaxyLayout(nodes, degreeById, clusterModel, clusterNodeGroups, clusterRadii);
+  var allNodesSignature = nodeListSignature(nodes);
+  var allHubLabelIds = hubLabelIds(nodes);
+  var layoutFitCache = new Map();
   var selectedId = hashNodeId() || mostConnectedNodeId(nodes, degreeById);
   var graphFocusActive = Boolean(selectedId);
   var query = "";
@@ -40,6 +47,7 @@
   var userZoom = 1;
   var pinchStartDistance = 0;
   var pinchStartZoom = 1;
+  var resizeRenderQueued = false;
 
   function updateZoomButtons() {
     if (zoomIn) zoomIn.disabled = userZoom >= 2.25;
@@ -286,7 +294,8 @@
     var isSmallScreen = window.matchMedia("(max-width: 40em)").matches;
     var viewportWidth = isSmallScreen ? Math.max(320, graph.clientWidth || 320) : Math.max(640, graph.clientWidth || 640);
     var viewportHeight = isSmallScreen ? 360 : 720;
-    var visibleIds = new Set(visible.map(function (node) { return node.id; }));
+    var visibleSignatureValue = visibleSignature(visible);
+    var visibleIds = visible === nodes ? null : new Set(visible.map(function (node) { return node.id; }));
     var fitted = fitLayoutToScrollableCanvas(visible, viewportWidth, viewportHeight);
     var width = fitted.width;
     var height = fitted.height;
@@ -294,12 +303,12 @@
     var displayWidth = Math.ceil(width * zoom);
     var displayHeight = Math.ceil(height * zoom);
     var positions = fitted.positions;
-    var hubLabels = hubLabelIds(visible);
+    var hubLabels = visible === nodes ? allHubLabelIds : hubLabelIds(visible);
     var selectedNode = graphFocusActive ? nodeById.get(selectedId) : null;
     var selectedColors = kindColors(selectedNode && selectedNode.kind);
     var selectedNeighborIds = graphFocusActive && selectedNode ? relatedNodeIds(selectedNode, visibleIds) : new Set();
     var edges = graphFocusActive && selectedNode
-      ? renderFocusedEdges(visible, visibleIds, positions, selectedColors)
+      ? renderFocusedEdges(selectedNode.id, visibleIds, positions, selectedColors)
       : "";
 
     var graphNodes = visible.map(function (node) {
@@ -328,7 +337,7 @@
     });
 
     graph.innerHTML = '<svg width="' + displayWidth + '" height="' + displayHeight + '" viewBox="0 0 ' + width + ' ' + height + '" role="img">' + edges + graphNodes.join("") + '</svg>';
-    centerGraphOnSelection(visible, positions, viewportWidth, viewportHeight, zoom);
+    centerGraphOnSelection(visibleSignatureValue, positions, viewportWidth, viewportHeight, zoom);
   }
 
   function renderGraphFocus() {
@@ -437,6 +446,14 @@
     return degrees;
   }
 
+  function maxDegreeValue(degrees) {
+    var value = 1;
+    degrees.forEach(function (degree) {
+      value = Math.max(value, degree || 0);
+    });
+    return value;
+  }
+
   function mostConnectedNodeId(list, degrees) {
     if (list.length === 0) return "";
     return list.slice().sort(function (left, right) {
@@ -448,6 +465,9 @@
   function fitLayoutToScrollableCanvas(visible, viewportWidth, viewportHeight) {
     var isSmallScreen = window.matchMedia("(max-width: 40em)").matches;
     var profile = galaxyScaleProfile(visible.length, isSmallScreen);
+    var cacheKey = visibleSignature(visible) + ":" + viewportWidth + ":" + viewportHeight + ":" + (isSmallScreen ? "small" : "wide");
+    var cached = layoutFitCache.get(cacheKey);
+    if (cached) return cached;
     var margin = profile.margin;
     var points = visible.map(function (node) {
       var point = layoutById.get(node.id) || { x: 0, y: 0 };
@@ -481,12 +501,21 @@
       fitted.set(points[0].id, { x: width / 2, y: height / 2 });
     }
 
-    return {
+    var fittedResult = {
       width: width,
       height: height,
       zoom: zoom,
       positions: addNodeBreathingRoom(visible, snapLayoutToGrid(fitted, width, height, margin), width, height, margin)
     };
+    rememberLayoutFit(cacheKey, fittedResult);
+    return fittedResult;
+  }
+
+  function rememberLayoutFit(key, value) {
+    if (layoutFitCache.size > 24) {
+      layoutFitCache.delete(layoutFitCache.keys().next().value);
+    }
+    layoutFitCache.set(key, value);
   }
 
   function galaxyScaleProfile(count, isSmallScreen) {
@@ -512,9 +541,9 @@
     return round(clamp(relaxedZoom, profile.minZoom, profile.maxZoom));
   }
 
-  function centerGraphOnSelection(visible, positions, viewportWidth, viewportHeight, zoom) {
+  function centerGraphOnSelection(visibleSignatureValue, positions, viewportWidth, viewportHeight, zoom) {
     var selected = positions.get(selectedId);
-    var key = selectedId + ":" + visibleSignature(visible) + ":" + query + ":" + viewportWidth + ":" + viewportHeight + ":" + zoom;
+    var key = selectedId + ":" + visibleSignatureValue + ":" + query + ":" + viewportWidth + ":" + viewportHeight + ":" + zoom;
     if (!selected || key === lastGraphCenterKey) return;
     lastGraphCenterKey = key;
     window.requestAnimationFrame(function () {
@@ -524,7 +553,11 @@
   }
 
   function visibleSignature(visible) {
-    return visible.map(function (node) { return node.id; }).join("|");
+    return visible === nodes ? allNodesSignature : nodeListSignature(visible);
+  }
+
+  function nodeListSignature(list) {
+    return list.map(function (node) { return node.id; }).join("|");
   }
 
   function hashNodeId() {
@@ -560,35 +593,26 @@
   function relatedNodeIds(selected, visibleIds) {
     var ids = new Set();
     if (!selected) return ids;
-    (selected.relations || []).forEach(function (relation) {
-      if (visibleIds.has(relation.to)) ids.add(relation.to);
-    });
-    nodes.forEach(function (node) {
-      if (!visibleIds.has(node.id)) return;
-      (node.relations || []).forEach(function (relation) {
-        if (relation.to === selected.id) ids.add(node.id);
-      });
+    var neighbors = neighborIdsById.get(selected.id) || new Set();
+    neighbors.forEach(function (neighborId) {
+      if (!visibleIds || visibleIds.has(neighborId)) ids.add(neighborId);
     });
     return ids;
   }
 
-  function renderFocusedEdges(visible, visibleIds, positions, colors) {
+  function renderFocusedEdges(focusedId, visibleIds, positions, colors) {
     var edges = [];
-    visible.forEach(function (node) {
-      (node.relations || []).forEach(function (relation) {
-        if (!visibleIds.has(relation.to)) return;
-        var active = node.id === selectedId || relation.to === selectedId;
-        if (!active) return;
-        var from = positions.get(node.id);
-        var to = positions.get(relation.to);
-        if (!from || !to) return;
-        var importance = relationImportance(relation);
-        var strokeWidth = round(0.75 + importance * 1.65);
-        var opacity = 0.48 + importance * 0.28;
-        var path = organicEdgePath(node.id, relation.to, from, to, importance);
-        var style = ' style="--active-edge: ' + colors.stroke + '; stroke-width: ' + strokeWidth + '; opacity: ' + opacity + ';"';
-        edges.push('<path class="edge"' + style + ' d="' + path + '"><title>Importance ' + formatImportance(importance) + '</title></path>');
-      });
+    (edgesByNodeId.get(focusedId) || []).forEach(function (edge) {
+      if (visibleIds && (!visibleIds.has(edge.from) || !visibleIds.has(edge.to))) return;
+      var from = positions.get(edge.from);
+      var to = positions.get(edge.to);
+      if (!from || !to) return;
+      var importance = relationImportance({ importance: edge.importance });
+      var strokeWidth = round(0.75 + importance * 1.65);
+      var opacity = 0.48 + importance * 0.28;
+      var path = organicEdgePath(edge.from, edge.to, from, to, importance);
+      var style = ' style="--active-edge: ' + colors.stroke + '; stroke-width: ' + strokeWidth + '; opacity: ' + opacity + ';"';
+      edges.push('<path class="edge"' + style + ' d="' + path + '"><title>Importance ' + formatImportance(importance) + '</title></path>');
     });
     return edges.join("");
   }
@@ -1018,7 +1042,7 @@
   }
 
   function galaxyCellSize() {
-    return 36;
+    return 42;
   }
 
   function gridDirection(index) {
@@ -1229,8 +1253,7 @@
     return strength;
   }
 
-  function buildClusterModel(list, degrees) {
-    var edges = graphEdges(list);
+  function buildClusterModel(list, degrees, edges) {
     var adjacency = buildAdjacency(edges);
     var hubs = selectClusterHubs(list, degrees, adjacency);
 
@@ -1344,6 +1367,24 @@
     return edges;
   }
 
+  function buildNeighborIdsById(list, edges) {
+    var neighbors = new Map(list.map(function (node) { return [node.id, new Set()]; }));
+    edges.forEach(function (edge) {
+      if (neighbors.has(edge.from)) neighbors.get(edge.from).add(edge.to);
+      if (neighbors.has(edge.to)) neighbors.get(edge.to).add(edge.from);
+    });
+    return neighbors;
+  }
+
+  function buildEdgesByNodeId(list, edges) {
+    var indexedEdges = new Map(list.map(function (node) { return [node.id, []]; }));
+    edges.forEach(function (edge) {
+      if (indexedEdges.has(edge.from)) indexedEdges.get(edge.from).push(edge);
+      if (indexedEdges.has(edge.to)) indexedEdges.get(edge.to).push(edge);
+    });
+    return indexedEdges;
+  }
+
   function snapLayoutToGrid(layout, width, height, margin) {
     var grid = galaxyCellSize();
     var minX = snapValueToCellCenter(margin / 2, grid);
@@ -1380,7 +1421,7 @@
   }
 
   function addNodeBreathingRoom(list, positions, width, height, margin) {
-    var padding = 8;
+    var padding = 18;
     var minX = margin / 2;
     var maxX = width - margin / 2;
     var minY = margin / 2;
@@ -1421,8 +1462,8 @@
   }
 
   function nodeCollisionRadius(node) {
-    if (!node) return 18;
-    return nodeRadius(node, false) + 12;
+    if (!node) return 30;
+    return nodeRadius(node, false) + 18;
   }
 
   function pairKey(leftId, rightId) {
@@ -1431,11 +1472,10 @@
 
   function nodeRadius(node, isSelected) {
     var degree = degreeById.get(node.id) || 0;
-    if (degree === 0) return isSelected ? 13 : 9;
-    var maxDegree = Math.max.apply(null, Array.from(degreeById.values()).concat([1]));
     var weight = Math.pow(degree / maxDegree, 0.48);
-    var radius = 4.5 + weight * 25;
-    return Math.round(Math.min(38, radius));
+    if (degree === 0) return isSelected ? 16 : 12;
+    var radius = 8 + weight * 44;
+    return Math.round(Math.min(52, radius));
   }
 
   function nodePriority(node) {
@@ -1671,11 +1711,20 @@
   }
 
   window.addEventListener("resize", function () {
-    renderGraph(nodes);
-    syncDetailHeight();
+    scheduleResizeRender();
   });
   if ("ResizeObserver" in window && graphWrap) {
     new ResizeObserver(syncDetailHeight).observe(graphWrap);
   }
   render();
+
+  function scheduleResizeRender() {
+    if (resizeRenderQueued) return;
+    resizeRenderQueued = true;
+    window.requestAnimationFrame(function () {
+      resizeRenderQueued = false;
+      renderGraph(nodes);
+      syncDetailHeight();
+    });
+  }
 })();
