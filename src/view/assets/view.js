@@ -10,6 +10,7 @@
   var graphEdgesList = graphEdges(nodes);
   var neighborIdsById = buildNeighborIdsById(nodes, graphEdgesList);
   var edgesByNodeId = buildEdgesByNodeId(nodes, graphEdgesList);
+  var incomingRelationsById = buildIncomingRelationsById(nodes);
   var clusterModel = buildClusterModel(nodes, degreeById, graphEdgesList);
   var clusterNodeGroups = nodesByCluster(nodes, clusterModel);
   var clusterRadii = clusterLayoutRadii(clusterModel.clusters, clusterNodeGroups, clusterModel.adjacency);
@@ -391,22 +392,20 @@
         '</button></li>'
       };
     });
-    nodes.forEach(function (source) {
-      (source.relations || []).forEach(function (relation) {
-        if (relation.to !== node.id) return;
-        var importance = relationImportance(relation);
-        var sourceColors = kindColors(source.kind);
-        related.push({
-          importance: importance,
-          title: source.title,
-          html: '<li><button type="button" data-node-id="' + escapeAttr(source.id) + '">' +
-          '<span class="relation-importance" title="Importance ' + escapeAttr(formatImportance(importance)) + '">' +
-          '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>' +
-          escapeHtml(formatImportance(importance)) + '</span>' +
-          '<span class="relation-kind"><span class="tag" style="--tag-fill: ' + sourceColors.fill + '; --tag-stroke: ' + sourceColors.stroke + ';">' + escapeHtml(source.kind) + '</span></span>' +
-          '<span class="relation-title">' + escapeHtml(source.title) + '</span>' +
-          '</button></li>'
-        });
+    (incomingRelationsById.get(node.id) || []).forEach(function (incoming) {
+      var source = incoming.source;
+      var importance = incoming.importance;
+      var sourceColors = kindColors(source.kind);
+      related.push({
+        importance: importance,
+        title: source.title,
+        html: '<li><button type="button" data-node-id="' + escapeAttr(source.id) + '">' +
+        '<span class="relation-importance" title="Importance ' + escapeAttr(formatImportance(importance)) + '">' +
+        '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>' +
+        escapeHtml(formatImportance(importance)) + '</span>' +
+        '<span class="relation-kind"><span class="tag" style="--tag-fill: ' + sourceColors.fill + '; --tag-stroke: ' + sourceColors.stroke + ';">' + escapeHtml(source.kind) + '</span></span>' +
+        '<span class="relation-title">' + escapeHtml(source.title) + '</span>' +
+        '</button></li>'
       });
     });
     related.sort(function (left, right) {
@@ -1143,12 +1142,13 @@
   }
 
   function clusterLinks(clusters, model) {
+    var indexedStrengths = clusterLinkStrengths(model);
     var links = [];
     for (var leftIndex = 0; leftIndex < clusters.length; leftIndex += 1) {
       for (var rightIndex = leftIndex + 1; rightIndex < clusters.length; rightIndex += 1) {
         var left = clusters[leftIndex];
         var right = clusters[rightIndex];
-        var strength = clusterLinkStrength(left.id, right.id, model);
+        var strength = indexedStrengths.get(pairKey(left.id, right.id)) || 0;
         if (strength > 0) links.push({ leftId: left.id, rightId: right.id, strength: strength });
       }
     }
@@ -1228,29 +1228,42 @@
     return centers;
   }
 
-  function clusterLinkStrength(leftClusterId, rightClusterId, model) {
-    var strength = 0;
-    var leftCluster = model.clusterById.get(leftClusterId);
-    var rightCluster = model.clusterById.get(rightClusterId);
-    var leftHubId = leftCluster && leftCluster.hubId;
-    var rightHubId = rightCluster && rightCluster.hubId;
+  function clusterLinkStrengths(model) {
+    var strengths = new Map();
+    var clusterIdByHubId = new Map(model.clusters.map(function (cluster) {
+      return [cluster.hubId, cluster.id];
+    }));
+
     model.adjacency.forEach(function (neighbors, nodeId) {
       var nodeClusterId = model.clusterByNode.get(nodeId);
-      if (leftHubId && rightHubId) {
-        var leftStrength = relationStrength(nodeId, leftHubId, model.adjacency);
-        var rightStrength = relationStrength(nodeId, rightHubId, model.adjacency);
-        if (leftStrength > 0 && rightStrength > 0) {
-          strength += Math.min(leftStrength, rightStrength);
+      var bridgeEntries = [];
+
+      neighbors.forEach(function (importance, neighborId) {
+        var bridgeClusterId = clusterIdByHubId.get(neighborId);
+        if (bridgeClusterId) bridgeEntries.push({ clusterId: bridgeClusterId, importance: importance });
+      });
+
+      for (var leftIndex = 0; leftIndex < bridgeEntries.length; leftIndex += 1) {
+        for (var rightIndex = leftIndex + 1; rightIndex < bridgeEntries.length; rightIndex += 1) {
+          addClusterLinkStrength(strengths, bridgeEntries[leftIndex].clusterId, bridgeEntries[rightIndex].clusterId, Math.min(bridgeEntries[leftIndex].importance, bridgeEntries[rightIndex].importance));
         }
       }
-      if (nodeClusterId !== leftClusterId) return;
+
+      if (!nodeClusterId) return;
       neighbors.forEach(function (importance, neighborId) {
-        if (model.clusterByNode.get(neighborId) === rightClusterId) {
-          strength += importance || 0.5;
-        }
+        var neighborClusterId = model.clusterByNode.get(neighborId);
+        if (!neighborClusterId || neighborClusterId === nodeClusterId) return;
+        if (nodeId > neighborId) return;
+        addClusterLinkStrength(strengths, nodeClusterId, neighborClusterId, importance || 0.5);
       });
     });
-    return strength;
+
+    return strengths;
+  }
+
+  function addClusterLinkStrength(strengths, leftClusterId, rightClusterId, strength) {
+    var key = pairKey(leftClusterId, rightClusterId);
+    strengths.set(key, (strengths.get(key) || 0) + strength);
   }
 
   function buildClusterModel(list, degrees, edges) {
@@ -1383,6 +1396,20 @@
       if (indexedEdges.has(edge.to)) indexedEdges.get(edge.to).push(edge);
     });
     return indexedEdges;
+  }
+
+  function buildIncomingRelationsById(list) {
+    var incoming = new Map(list.map(function (node) { return [node.id, []]; }));
+    list.forEach(function (source) {
+      (source.relations || []).forEach(function (relation) {
+        if (!incoming.has(relation.to)) return;
+        incoming.get(relation.to).push({
+          source: source,
+          importance: relationImportance(relation)
+        });
+      });
+    });
+    return incoming;
   }
 
   function snapLayoutToGrid(layout, width, height, margin) {
