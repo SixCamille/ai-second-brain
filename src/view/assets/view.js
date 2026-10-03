@@ -48,8 +48,6 @@
   var pinchStartDistance = 0;
   var pinchStartZoom = 1;
   var resizeRenderQueued = false;
-  var GALAXY_CELL_SIZE = 52;
-  var NODE_SPACING_PADDING = 22;
 
   function updateZoomButtons() {
     if (zoomIn) zoomIn.disabled = userZoom >= 2.25;
@@ -1044,7 +1042,7 @@
   }
 
   function galaxyCellSize() {
-    return GALAXY_CELL_SIZE;
+    return 42;
   }
 
   function gridDirection(index) {
@@ -1110,11 +1108,11 @@
   }
 
   function clusterRadiusFromActivity(memberCount, linkedNodeCount, relationWeight) {
-    var radius = 112 +
-      Math.sqrt(Math.max(1, memberCount)) * 34 +
-      Math.sqrt(Math.max(0, linkedNodeCount)) * 12 +
-      Math.sqrt(Math.max(0, relationWeight)) * 7;
-    return Math.min(Math.max(160, radius), 360);
+    var radius = 92 +
+      Math.sqrt(Math.max(1, memberCount)) * 28 +
+      Math.sqrt(Math.max(0, linkedNodeCount)) * 10 +
+      Math.sqrt(Math.max(0, relationWeight)) * 6;
+    return Math.min(Math.max(120, radius), 260);
   }
 
   function clusterCenters(clusters, totalNodes, model, clusterRadii) {
@@ -1128,7 +1126,7 @@
 
   function initialClusterCenters(clusters, totalNodes) {
     var centers = new Map();
-    var radius = Math.max(340, 210 + Math.sqrt(Math.max(1, totalNodes)) * 34);
+    var radius = Math.max(260, 155 + Math.sqrt(Math.max(1, totalNodes)) * 28);
     clusters
       .slice()
       .sort(function (left, right) {
@@ -1145,13 +1143,12 @@
   }
 
   function clusterLinks(clusters, model) {
-    var indexedStrengths = clusterLinkStrengths(model);
     var links = [];
     for (var leftIndex = 0; leftIndex < clusters.length; leftIndex += 1) {
       for (var rightIndex = leftIndex + 1; rightIndex < clusters.length; rightIndex += 1) {
         var left = clusters[leftIndex];
         var right = clusters[rightIndex];
-        var strength = indexedStrengths.get(pairKey(left.id, right.id)) || 0;
+        var strength = clusterLinkStrength(left.id, right.id, model);
         if (strength > 0) links.push({ leftId: left.id, rightId: right.id, strength: strength });
       }
     }
@@ -1212,9 +1209,9 @@
   function clusterIdealDistance(link, clusterRadii, totalNodes) {
     var leftRadius = clusterRadii.get(link.leftId) || 140;
     var rightRadius = clusterRadii.get(link.rightId) || 140;
-    var base = leftRadius + rightRadius + galaxyCellSize() * 3.7;
+    var base = leftRadius + rightRadius + galaxyCellSize() * 3.4;
     var strengthBonus = Math.min(150, link.strength * 36);
-    return Math.max(base, 280 + Math.sqrt(Math.max(1, totalNodes)) * 7 - strengthBonus);
+    return Math.max(base, 220 + Math.sqrt(Math.max(1, totalNodes)) * 6 - strengthBonus);
   }
 
   function normalizeClusterCenters(centers) {
@@ -1231,42 +1228,29 @@
     return centers;
   }
 
-  function clusterLinkStrengths(model) {
-    var strengths = new Map();
-    var clusterIdByHubId = new Map(model.clusters.map(function (cluster) {
-      return [cluster.hubId, cluster.id];
-    }));
-
+  function clusterLinkStrength(leftClusterId, rightClusterId, model) {
+    var strength = 0;
+    var leftCluster = model.clusterById.get(leftClusterId);
+    var rightCluster = model.clusterById.get(rightClusterId);
+    var leftHubId = leftCluster && leftCluster.hubId;
+    var rightHubId = rightCluster && rightCluster.hubId;
     model.adjacency.forEach(function (neighbors, nodeId) {
       var nodeClusterId = model.clusterByNode.get(nodeId);
-      var bridgeEntries = [];
-
-      neighbors.forEach(function (strength, neighborId) {
-        var bridgeClusterId = clusterIdByHubId.get(neighborId);
-        if (bridgeClusterId) bridgeEntries.push({ clusterId: bridgeClusterId, strength: strength });
-      });
-
-      for (var leftIndex = 0; leftIndex < bridgeEntries.length; leftIndex += 1) {
-        for (var rightIndex = leftIndex + 1; rightIndex < bridgeEntries.length; rightIndex += 1) {
-          addClusterLinkStrength(strengths, bridgeEntries[leftIndex].clusterId, bridgeEntries[rightIndex].clusterId, Math.min(bridgeEntries[leftIndex].strength, bridgeEntries[rightIndex].strength));
+      if (leftHubId && rightHubId) {
+        var leftStrength = relationStrength(nodeId, leftHubId, model.adjacency);
+        var rightStrength = relationStrength(nodeId, rightHubId, model.adjacency);
+        if (leftStrength > 0 && rightStrength > 0) {
+          strength += Math.min(leftStrength, rightStrength);
         }
       }
-
-      if (!nodeClusterId) return;
+      if (nodeClusterId !== leftClusterId) return;
       neighbors.forEach(function (importance, neighborId) {
-        var neighborClusterId = model.clusterByNode.get(neighborId);
-        if (!neighborClusterId || neighborClusterId === nodeClusterId) return;
-        if (nodeId > neighborId) return;
-        addClusterLinkStrength(strengths, nodeClusterId, neighborClusterId, importance || 0.5);
+        if (model.clusterByNode.get(neighborId) === rightClusterId) {
+          strength += importance || 0.5;
+        }
       });
     });
-
-    return strengths;
-  }
-
-  function addClusterLinkStrength(strengths, leftClusterId, rightClusterId, strength) {
-    var key = pairKey(leftClusterId, rightClusterId);
-    strengths.set(key, (strengths.get(key) || 0) + strength);
+    return strength;
   }
 
   function buildClusterModel(list, degrees, edges) {
@@ -1437,13 +1421,39 @@
   }
 
   function addNodeBreathingRoom(list, positions, width, height, margin) {
+    var padding = 18;
     var minX = margin / 2;
     var maxX = width - margin / 2;
     var minY = margin / 2;
     var maxY = height - margin / 2;
-    var steps = list.length > 800 ? 7 : list.length > 300 ? 10 : 16;
-    for (var step = 0; step < steps; step += 1) {
-      relaxNearbyNodes(list, positions, minX, maxX, minY, maxY);
+    for (var step = 0; step < 28; step += 1) {
+      for (var leftIndex = 0; leftIndex < list.length; leftIndex += 1) {
+        for (var rightIndex = leftIndex + 1; rightIndex < list.length; rightIndex += 1) {
+          var left = list[leftIndex];
+          var right = list[rightIndex];
+          var leftPoint = positions.get(left.id);
+          var rightPoint = positions.get(right.id);
+          if (!leftPoint || !rightPoint) continue;
+          var dx = rightPoint.x - leftPoint.x;
+          var dy = rightPoint.y - leftPoint.y;
+          var distance = Math.sqrt(dx * dx + dy * dy);
+          if (distance === 0) {
+            var angle = hashHue(pairKey(left.id, right.id)) * Math.PI / 180;
+            dx = Math.cos(angle);
+            dy = Math.sin(angle);
+            distance = 1;
+          }
+          var wanted = nodeCollisionRadius(left) + nodeCollisionRadius(right) + padding;
+          if (distance >= wanted) continue;
+          var push = Math.min(8, (wanted - distance) / 2);
+          var moveX = dx / distance * push;
+          var moveY = dy / distance * push;
+          leftPoint.x = clamp(leftPoint.x - moveX, minX, maxX);
+          leftPoint.y = clamp(leftPoint.y - moveY, minY, maxY);
+          rightPoint.x = clamp(rightPoint.x + moveX, minX, maxX);
+          rightPoint.y = clamp(rightPoint.y + moveY, minY, maxY);
+        }
+      }
     }
     positions.forEach(function (point, id) {
       positions.set(id, { x: round(point.x), y: round(point.y) });
@@ -1451,71 +1461,9 @@
     return positions;
   }
 
-  function relaxNearbyNodes(list, positions, minX, maxX, minY, maxY) {
-    var spatialIndex = buildSpatialIndex(list, positions);
-    list.forEach(function (left) {
-      var leftPoint = positions.get(left.id);
-      if (!leftPoint) return;
-      nearbyNodeIds(leftPoint, spatialIndex).forEach(function (rightId) {
-        if (rightId <= left.id) return;
-        var right = nodeById.get(rightId);
-        var rightPoint = positions.get(rightId);
-        if (!right || !rightPoint) return;
-        separateNodePair(left, right, leftPoint, rightPoint, minX, maxX, minY, maxY);
-      });
-    });
-  }
-
-  function buildSpatialIndex(list, positions) {
-    var index = new Map();
-    list.forEach(function (node) {
-      var point = positions.get(node.id);
-      if (!point) return;
-      var key = cellKey(point, GALAXY_CELL_SIZE * 2);
-      if (!index.has(key)) index.set(key, []);
-      index.get(key).push(node.id);
-    });
-    return index;
-  }
-
-  function nearbyNodeIds(point, spatialIndex) {
-    var ids = [];
-    var cell = GALAXY_CELL_SIZE * 2;
-    var baseX = Math.round((point.x - cell / 2) / cell);
-    var baseY = Math.round((point.y - cell / 2) / cell);
-    for (var dx = -1; dx <= 1; dx += 1) {
-      for (var dy = -1; dy <= 1; dy += 1) {
-        var bucket = spatialIndex.get((baseX + dx) + ":" + (baseY + dy));
-        if (bucket) ids = ids.concat(bucket);
-      }
-    }
-    return ids;
-  }
-
-  function separateNodePair(left, right, leftPoint, rightPoint, minX, maxX, minY, maxY) {
-    var dx = rightPoint.x - leftPoint.x;
-    var dy = rightPoint.y - leftPoint.y;
-    var distance = Math.sqrt(dx * dx + dy * dy);
-    if (distance === 0) {
-      var angle = hashHue(pairKey(left.id, right.id)) * Math.PI / 180;
-      dx = Math.cos(angle);
-      dy = Math.sin(angle);
-      distance = 1;
-    }
-    var wanted = nodeCollisionRadius(left) + nodeCollisionRadius(right) + NODE_SPACING_PADDING;
-    if (distance >= wanted) return;
-    var push = Math.min(10, (wanted - distance) / 2);
-    var moveX = dx / distance * push;
-    var moveY = dy / distance * push;
-    leftPoint.x = clamp(leftPoint.x - moveX, minX, maxX);
-    leftPoint.y = clamp(leftPoint.y - moveY, minY, maxY);
-    rightPoint.x = clamp(rightPoint.x + moveX, minX, maxX);
-    rightPoint.y = clamp(rightPoint.y + moveY, minY, maxY);
-  }
-
   function nodeCollisionRadius(node) {
-    if (!node) return 38;
-    return nodeRadius(node, false) + 20;
+    if (!node) return 30;
+    return nodeRadius(node, false) + 18;
   }
 
   function pairKey(leftId, rightId) {
@@ -1525,9 +1473,9 @@
   function nodeRadius(node, isSelected) {
     var degree = degreeById.get(node.id) || 0;
     var weight = Math.pow(degree / maxDegree, 0.48);
-    if (degree === 0) return isSelected ? 22 : 16;
-    var radius = 12 + weight * 58;
-    return Math.round(Math.min(isSelected ? 76 : 70, radius + (isSelected ? 6 : 0)));
+    if (degree === 0) return isSelected ? 16 : 12;
+    var radius = 8 + weight * 44;
+    return Math.round(Math.min(52, radius));
   }
 
   function nodePriority(node) {
